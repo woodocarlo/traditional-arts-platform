@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import allGuidesData from "../../../../public/assets/props.json";
 
@@ -82,14 +82,14 @@ type Guide = {
   phara: string;
   props?: string[];
   lighting?: string;
-  settings?: Record<string, any>;
+  settings?: Record<string, unknown>;
 };
 
 // --- GuideCard Component ---
 const GuideCard = ({ guide }: { guide: Guide }) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
-  const renderSettings = (settings: Record<string, any> | undefined) => {
+  const renderSettings = (settings: Record<string, unknown> | undefined) => {
     if (!settings) return null;
     return Object.entries(settings).map(([key, value]) => (
       <li key={key} className="text-sm bg-white/5 px-3 py-1.5 rounded-lg">
@@ -157,7 +157,7 @@ export default function PhotoGuidance() {
   const [isShuffling, setIsShuffling] = useState(false);
   const [displayedGuides, setDisplayedGuides] = useState<Guide[]>([]);
 
-  const allGuides: Guide[] = allGuidesData.flat();
+  const allGuides: Guide[] = useMemo(() => allGuidesData.flat(), []);
 
   const shuffleGuides = useCallback(() => {
     setIsShuffling(true);
@@ -183,7 +183,7 @@ export default function PhotoGuidance() {
 
   useEffect(() => {
     shuffleGuides();
-  }, []);
+  }, [shuffleGuides]);
 
   return (
     <div className="min-h-screen text-white p-6 relative overflow-hidden">

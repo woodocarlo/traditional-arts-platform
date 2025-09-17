@@ -11,7 +11,8 @@ interface GalleryItem {
   id: number;
   src: string;
   alt: string;
-  type?: 'image' | 'video' | 'audio';
+  // accept the common known types but allow any string to accommodate runtime data
+  type?: 'image' | 'video' | 'audio' | string;
   posts: number;
   purchases: number;
   date: string;
@@ -120,7 +121,7 @@ const translations = {
 };
 
 // Sample gallery items
-const galleryItems = [
+const galleryItems: GalleryItem[] = [
     { id: 1, src: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?q=80&w=800&auto=format&fit=crop', alt: 'Madhubani Painting', type: 'image', posts: 12, purchases: 5, date: '2023-10-15' },
     { id: 2, src: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=800&auto=format&fit=crop', alt: 'Warli Art', type: 'image', posts: 8, purchases: 3, date: '2023-09-22' },
     { id: 3, src: 'https://images.unsplash.com/photo-1578321272176-b7bbc0679853?q=80&w=800&auto=format&fit=crop', alt: 'Pattachitra', type: 'image', posts: 15, purchases: 7, date: '2023-11-05' },
@@ -288,15 +289,15 @@ export default function GalleryPage() {
   }, [router]);
 
   // Handle prompt create post from UploadModal
-  const handlePromptCreatePost = useCallback((file: any) => {
+  const handlePromptCreatePost = useCallback((file: Partial<GalleryItem> & { id?: number; name?: string; minPrice?: number; src?: string; alt?: string; type?: string }) => {
     try {
       console.log('Directly creating post for:', file);
       // Convert FileObj to GalleryItem format for handleCreatePost
       const galleryItem: GalleryItem = {
-        id: file.id,
-        src: file.src,
-        alt: file.alt,
-        type: file.type,
+        id: file.id ?? Date.now(),
+        src: file.src ?? '',
+        alt: file.alt ?? file.name ?? 'Uploaded Art',
+                  type: (file.type as GalleryItem['type']) ?? undefined,
         posts: 0,
         purchases: 0,
         date: new Date().toISOString().split('T')[0],

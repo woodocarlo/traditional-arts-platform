@@ -36,11 +36,25 @@ const fontLibrary = {
   "Merriweather": "font-merriweather",
 };
 
+interface GeneratedPost {
+  bgUrl: string;
+  bgColor?: string;
+  centerUrl?: string;
+  overlayUrl?: string;
+  heading?: string;
+  subheading?: string;
+  punchline?: string;
+  fontFamily?: string;
+  opacity?: number;
+  caption?: string;
+  hashtags?: string[];
+}
+
 export default function CraftPostGenerator() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [aspectRatio, setAspectRatio] = useState<string>("3:4");
-  const [generatedPosts, setGeneratedPosts] = useState<any[]>([]);
+  const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
@@ -251,7 +265,7 @@ export default function CraftPostGenerator() {
     }
   };
 
-  const drawPostToCanvas = (post: any, index: number) => {
+  const drawPostToCanvas = (post: GeneratedPost, index: number) => {
     const canvas = canvasRefs.current[index];
     if (!canvas) return;
     
@@ -318,7 +332,7 @@ export default function CraftPostGenerator() {
           if (post.overlayUrl && post.overlayUrl !== "none") {
             const overlayImg = new Image();
             overlayImg.onload = () => {
-              ctx.globalAlpha = post.opacity;
+              ctx.globalAlpha = post.opacity ?? 1.0;
               ctx.drawImage(overlayImg, 0, 0, canvasWidth, canvasHeight);
               ctx.globalAlpha = 1.0;
             };
@@ -332,7 +346,7 @@ export default function CraftPostGenerator() {
         if (post.overlayUrl && post.overlayUrl !== "none") {
           const overlayImg = new Image();
           overlayImg.onload = () => {
-            ctx.globalAlpha = post.opacity;
+            ctx.globalAlpha = post.opacity ?? 1.0;
             ctx.drawImage(overlayImg, 0, 0, canvasWidth, canvasHeight);
             ctx.globalAlpha = 1.0;
             drawTextElements(ctx, post, canvasWidth, canvasHeight);
@@ -360,7 +374,7 @@ export default function CraftPostGenerator() {
     img.src = processedImage;
   };
 
-  const drawTextElements = (ctx: CanvasRenderingContext2D, post: any, canvasWidth: number, canvasHeight: number) => {
+  const drawTextElements = (ctx: CanvasRenderingContext2D, post: GeneratedPost, canvasWidth: number, canvasHeight: number) => {
     const textColor = getContrastColor(post.bgColor || "dark");
     ctx.fillStyle = textColor;
     
@@ -368,13 +382,13 @@ export default function CraftPostGenerator() {
     
     ctx.font = `bold 28px ${post.fontFamily || "Arial"}`;
     ctx.textAlign = 'center';
-    ctx.fillText(post.heading, centerX, 40);
+  ctx.fillText(post.heading ?? '', centerX, 40);
     
     ctx.font = `22px ${post.fontFamily || "Arial"}`;
-    ctx.fillText(post.subheading, centerX, 70);
+  ctx.fillText(post.subheading ?? '', centerX, 70);
     
     ctx.font = `20px ${post.fontFamily || "Arial"}`;
-    ctx.fillText(post.punchline, centerX, canvasHeight - 30);
+  ctx.fillText(post.punchline ?? '', centerX, canvasHeight - 30);
   };
 
   const generatePosts = async () => {
@@ -389,7 +403,7 @@ export default function CraftPostGenerator() {
     
     // Generate exactly 3 posts
     const numPosts = 3;
-    const posts: any[] = [];
+  const posts: GeneratedPost[] = [];
     
     for (let i = 0; i < steps.length; i++) {
       setCurrentStep(i);
@@ -416,7 +430,7 @@ export default function CraftPostGenerator() {
 
       posts.push({
         bgUrl: bg.url,
-        bgColor: bg.color || "dark",
+        bgColor: (bg as { color?: string }).color || "dark",
         centerUrl: center.url,
         overlayUrl: overlay.url,
         heading,
@@ -464,7 +478,7 @@ export default function CraftPostGenerator() {
     updatedPosts[index] = {
       ...updatedPosts[index],
       bgUrl: bg.url,
-      bgColor: bg.color || "dark",
+      bgColor: (bg as { color?: string }).color || "dark",
       centerUrl: center.url,
       overlayUrl: overlay.url,
       fontFamily: randomFont,
@@ -488,11 +502,16 @@ export default function CraftPostGenerator() {
 
       const file = new File([blob], 'post.png', { type: 'image/png' });
 
-      if (navigator.share) {
-        await navigator.share({
+      type ShareNavigator = Navigator & {
+        share?: (data: { files?: File[]; title?: string; text?: string }) => Promise<void>;
+      };
+
+      const nav = typeof navigator !== 'undefined' ? (navigator as ShareNavigator) : undefined;
+      if (nav && typeof nav.share === 'function') {
+        await nav.share({
           files: [file],
           title: 'My Craft Post',
-          text: generatedPosts[index].caption + '\n\n' + generatedPosts[index].hashtags.join(' '),
+          text: (generatedPosts[index]?.caption ?? '') + '\n\n' + ((generatedPosts[index]?.hashtags ?? []).join(' ')),
         });
       } else {
         alert("Web Share API is not supported in this browser. Please download the image manually.");
@@ -631,11 +650,11 @@ export default function CraftPostGenerator() {
             <div>
               <h4 className="text-2xl font-semibold text-white mb-4">Your Generated Posts</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {generatedPosts.map((post: any, index: number) => (
+                {generatedPosts.map((post: GeneratedPost, index: number) => (
                   <div key={index} className="bg-white/5 p-4 rounded-lg border border-white/20">
                     <div className="relative group">
                       <canvas 
-                        ref={el => canvasRefs.current[index] = el}
+                        ref={(el: HTMLCanvasElement | null) => { canvasRefs.current[index] = el; return; }}
                         className="w-full bg-gray-700 mb-4 rounded-lg"
                       />
                       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center rounded-lg">
@@ -652,7 +671,7 @@ export default function CraftPostGenerator() {
                           <TwitterIcon />
                           Twitter
                         </a>
-                        {navigator.share && (
+                        {typeof navigator !== 'undefined' && ((navigator as ShareNavigator).share) && (
                           <button onClick={() => handleShare(index)} className="text-white px-4 py-2 rounded-lg m-1 flex items-center gap-2 bg-white/5 hover:bg-white/10 transition-colors">
                             <ShareIcon />
                             Share
@@ -662,11 +681,11 @@ export default function CraftPostGenerator() {
                     </div>
                     <div className="mb-4 text-gray-300">
                       <p className="font-semibold text-white">Caption:</p>
-                      <p>{post.caption}</p>
+                      <p>{post.caption ?? ''}</p>
                     </div>
                     <div className="mb-4 text-gray-300">
                       <p className="font-semibold text-white">Hashtags:</p>
-                      <p>{post.hashtags.join(" ")}</p>
+                      <p>{(post.hashtags ?? []).join(" ")}</p>
                     </div>
                     <button 
                       onClick={() => regenerateImage(index)}
@@ -697,3 +716,8 @@ export default function CraftPostGenerator() {
     </div>
   );
 }
+
+// Narrow navigator.share typing for feature detection without using `any`
+type ShareNavigator = Navigator & {
+  share?: (data: { files?: File[]; title?: string; text?: string }) => Promise<void>;
+};

@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 "use client";
 
 import React from 'react';
@@ -29,7 +30,7 @@ const VideoCameraIcon = () => (
   </svg>
 );
 
-const FeaturesSection = ({ t }) => {
+const FeaturesSection = ({ t }: { t: any }) => {
   return (
     <section id="features" className="py-20 bg-[#4D080F] relative overflow-hidden">
       <div className="relative z-10">
@@ -49,7 +50,7 @@ const FeaturesSection = ({ t }) => {
             <div className="relative group bg-gradient-to-br from-purple-900/80 to-indigo-900/80 p-6 rounded-2xl backdrop-blur-sm border border-purple-700/30 hover:border-purple-500/50 transition-all duration-300 hover:scale-105 shadow-2xl cursor-pointer">
               <img
                 src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?q=80&w=400&auto-format&fit=crop"
-                onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/400x300/1E293B/FFFFFF?text=Art'; }}
+                onError={(e) => { const img = e.currentTarget as HTMLImageElement; img.onerror = null; img.src = 'https://placehold.co/400x300/1E293B/FFFFFF?text=Art'; }}
                 alt="Abstract art background"
                 className="absolute inset-0 h-full w-full object-cover opacity-20 group-hover:opacity-35 transition-opacity duration-300"
               />
@@ -76,7 +77,7 @@ const FeaturesSection = ({ t }) => {
             <div className="relative group bg-gradient-to-br from-green-900/80 to-emerald-900/80 p-6 rounded-2xl backdrop-blur-sm border border-green-700/30 hover:border-green-500/50 transition-all duration-300 hover:scale-105 shadow-2xl cursor-pointer">
               <img 
                 src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=400&auto-format&fit=crop"
-                onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/400x300/1E293B/FFFFFF?text=Gallery'; }}
+                onError={(e) => { const img = e.currentTarget as HTMLImageElement; img.onerror = null; img.src = 'https://placehold.co/400x300/1E293B/FFFFFF?text=Gallery'; }}
                 alt="Art gallery background" 
                 className="absolute inset-0 h-full w-full object-cover opacity-20 group-hover:opacity-35 transition-opacity duration-300" 
               />
@@ -102,7 +103,7 @@ const FeaturesSection = ({ t }) => {
           <div className="relative group bg-gradient-to-br from-orange-900/80 to-red-900/80 p-6 rounded-2xl backdrop-blur-sm border border-orange-700/30 hover:border-orange-500/50 transition-all duration-300 hover:scale-105 shadow-2xl">
             <img 
               src="https://images.unsplash.com/photo-1611224923853-80b023f02d71?q=80&w=400&auto-format&fit=crop"
-              onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/400x300/1E293B/FFFFFF?text=Growth'; }}
+              onError={(e) => { const img = e.currentTarget as HTMLImageElement; img.onerror = null; img.src = 'https://placehold.co/400x300/1E293B/FFFFFF?text=Growth'; }}
               alt="Abstract growth chart background" 
               className="absolute inset-0 h-full w-full object-cover opacity-20 group-hover:opacity-35 transition-opacity duration-300" 
             />
@@ -121,7 +122,7 @@ const FeaturesSection = ({ t }) => {
           <div className="relative group bg-gradient-to-br from-amber-900/80 to-yellow-900/80 p-6 rounded-2xl backdrop-blur-sm border border-amber-700/30 hover:border-amber-500/50 transition-all duration-300 hover:scale-105 shadow-2xl">
             <img 
               src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=400&auto-format&fit=crop"
-              onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/400x300/1E293B/FFFFFF?text=Event'; }}
+              onError={(e) => { const img = e.currentTarget as HTMLImageElement; img.onerror = null; img.src = 'https://placehold.co/400x300/1E293B/FFFFFF?text=Event'; }}
               alt="Audience at an event background" 
               className="absolute inset-0 h-full w-full object-cover opacity-20 group-hover:opacity-35 transition-opacity duration-300" 
             />

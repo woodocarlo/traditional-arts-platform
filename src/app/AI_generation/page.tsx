@@ -24,7 +24,7 @@ const BackArrowIcon = () => (
 );
 
 // --- Icons for the Feature Cards ---
-const PodcastIcon = ({ className }: { className: string }) => (
+const PodcastIcon = ({ className }: { className?: string }) => (
   <svg
     className={className}
     viewBox="0 0 24 24"
@@ -41,7 +41,7 @@ const PodcastIcon = ({ className }: { className: string }) => (
   </svg>
 );
 
-const SocialMediaIcon = ({ className }: { className: string }) => (
+const SocialMediaIcon = ({ className }: { className?: string }) => (
   <svg
     className={className}
     viewBox="0 0 24 24"
@@ -57,7 +57,7 @@ const SocialMediaIcon = ({ className }: { className: string }) => (
   </svg>
 );
 
-const CameraIcon = ({ className }: { className: string }) => (
+const CameraIcon = ({ className }: { className?: string }) => (
   <svg
     className={className}
     viewBox="0 0 24 24"
@@ -72,7 +72,7 @@ const CameraIcon = ({ className }: { className: string }) => (
   </svg>
 );
 
-const EditIcon = ({ className }: { className: string }) => (
+const EditIcon = ({ className }: { className?: string }) => (
   <svg
     className={className}
     viewBox="0 0 24 24"

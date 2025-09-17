@@ -1,7 +1,7 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 interface CardData {
-  Icon: React.ComponentType<any>;
+  Icon: React.ComponentType<{ className?: string }>;
   title: string;
   details: string;
 }
@@ -30,7 +30,8 @@ interface Podcast {
 }
 interface GeneratedPodcast {
   script: string;
-  [key: string]: any;
+  title?: string;
+  [key: string]: string | number | boolean | undefined;
 }
 const CloseIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -41,19 +42,6 @@ const CloseIcon = () => (
 const PlayIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
     <polygon points="5,3 19,12 5,21"></polygon>
-  </svg>
-);
-const PauseIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-    <rect x="6" y="4" width="4" height="16"></rect>
-    <rect x="14" y="4" width="4" height="16"></rect>
-  </svg>
-);
-const DownloadIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-    <polyline points="7,10 12,15 17,10"></polyline>
-    <line x1="12" y1="15" x2="12" y2="3"></line>
   </svg>
 );
 const TrashIcon = () => (
@@ -70,7 +58,7 @@ const LoadingSpinner = () => (
 );
 export default function CreatePostSection({ cardId, onClose, cardData }: { cardId: number; onClose: () => void; cardData: CardData }) {
   const [activeTab, setActiveTab] = useState<string>('create');
-  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  // Removed unused states: selectedTemplate, setSelectedTemplate, isGeneratingAudio, isPlaying
   // Podcast-specific states
   const [podcastConfig, setPodcastConfig] = useState<PodcastConfig>({
     language: 'Hindi',
@@ -88,8 +76,6 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [generatedPodcast, setGeneratedPodcast] = useState<GeneratedPodcast | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [isGeneratingAudio, setIsGeneratingAudio] = useState<boolean>(false);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isEditingScript, setIsEditingScript] = useState<boolean>(false);
   useEffect(() => {
     loadUploadedStories();
@@ -100,7 +86,7 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
       const response = await fetch('/api/podcast/get-uploaded-stories');
       const stories = await response.json();
       setUploadedStories(stories);
-    } catch (error) {
+    } catch (_err) {
       console.log('No stories found or error loading stories');
       setUploadedStories([]);
     }
@@ -110,7 +96,7 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
       const response = await fetch('/api/podcast/get-existing-podcasts');
       const podcasts = await response.json();
       setExistingPodcasts(podcasts);
-    } catch (error) {
+    } catch (_err) {
       console.log('No existing podcasts found');
       setExistingPodcasts([]);
     }
@@ -124,8 +110,8 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
     try {
       const audio = new Audio(url);
       audio.play().catch(e => console.error('❌ Playback error:', e));
-    } catch (error) {
-      console.error('❌ Error creating audio:', error);
+    } catch (_err) {
+      console.error('❌ Error creating audio:', _err);
     }
   };
   const deletePodcast = async (id: string) => {
@@ -228,7 +214,6 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
   script: string,
   language: string = podcastConfig.language
 ) => {
-  setIsGeneratingAudio(true);
   try {
     console.log("🎯 Generating audio for script...");
     const response = await fetch("/api/podcast/generate-podcast-audio", {
@@ -258,11 +243,14 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
     });
     setAudioUrl(base64Audio);
     console.log("✅ Base64 audio URL set");
-  } catch (error: any) {
-    console.error("❌ Error generating audio:", error);
-    alert(`Audio generation failed: ${error.message}`);
-  } finally {
-    setIsGeneratingAudio(false);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("❌ Error generating audio:", error);
+      alert(`Audio generation failed: ${error.message}`);
+    } else {
+      console.error("❌ Unknown error generating audio:", error);
+      alert("Audio generation failed due to an unknown error.");
+    }
   }
 };
   const steps = [
@@ -571,8 +559,6 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
                 <audio
                   controls
                   src={audioUrl}
-                  onPlay={() => setIsPlaying(true)}
-                  onPause={() => setIsPlaying(false)}
                   onError={(e) => console.error('Audio element error:', e)}
                   className="w-full"
                 >

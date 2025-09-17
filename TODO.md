@@ -1,7 +1,13 @@
-# TODO: Implement File Upload to Specific Directory
-
-## Pending Tasks
-- [ ] Create API route at /api/upload to handle file uploads and save to uploads directory
-- [ ] Modify UploadModal.tsx to call the API route instead of simulating upload
-- [ ] Ensure files are retrieved from the uploads directory (via public serving)
-- [ ] Test the upload functionality
+- [ ] Fix ESLint issues in src/app/AI_generation/CreatePostSection.tsx
+  - [ ] Remove unused import: useRef
+  - [ ] Update CardData interface: Replace React.ComponentType<any> with React.ComponentType<{ className?: string }>
+  - [ ] Update GeneratedPodcast interface: Replace [key: string]: any with specific types
+  - [ ] Remove unused components: PauseIcon, DownloadIcon
+  - [ ] Remove unused state: selectedTemplate, setSelectedTemplate, isGeneratingAudio, isPlaying
+  - [ ] Handle unused error variables: Replace error with _error in catch blocks
+  - [ ] Fix explicit any in catch: Change error: any to error: unknown
+- [ ] Fix ESLint issues in src/app/AI_generation/photo_guidance/page.tsx
+  - [ ] Update Guide type: Change Record<string, any> to Record<string, string | number | boolean>
+  - [ ] Replace <img> with <Image> from next/image
+  - [ ] Add shuffleGuides to useEffect dependency array
+- [ ] Run ESLint to verify fixes

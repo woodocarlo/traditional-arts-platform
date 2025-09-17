@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -130,7 +131,7 @@ const translations = {
 };
 
 // --- UI Components ---
-const SideNav = ({ isOpen, onClose, t }) => {
+const SideNav = ({ isOpen, onClose, t }: { isOpen: boolean; onClose: () => void; t: any }) => {
   return (
     <div className={`fixed inset-y-0 left-0 w-60 bg-gradient-to-b from-slate-800 to-black backdrop-blur-lg border-r border-slate-700 z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       <div className="p-5">
@@ -149,7 +150,7 @@ const SideNav = ({ isOpen, onClose, t }) => {
   );
 };
 
-const Header = ({ onMenuClick, onLanguageToggle, t }) => (
+const Header = ({ onMenuClick, onLanguageToggle, t }: { onMenuClick: () => void; onLanguageToggle: () => void; t: any }) => (
   <header className="fixed top-0 left-0 right-0 z-40 bg-black/50 backdrop-blur-sm border-b border-slate-800/50">
     <div className="container mx-auto px-4 py-3 flex justify-between items-center">
       <div className="flex items-center">
@@ -210,8 +211,8 @@ const ShineSweep = () => (
   </div>
 );
 
-function Slide({ active, variant, children }) {
-  const variantGradient = (v) => {
+function Slide({ active, variant, children }: { active: boolean; variant: string; children: React.ReactNode }) {
+  const variantGradient = (v: string) => {
     switch (v) {
       case 'crimson': return 'bg-gradient-to-br from-red-900/80 via-red-800/80 to-rose-900/80';
       case 'emerald': return 'bg-gradient-to-br from-emerald-900/80 via-green-800/80 to-teal-900/80';
@@ -254,7 +255,7 @@ const GlobalStyles = () => (
 
 const HeroSection = ({ onMenuClick, t, onLanguageToggle }: { onMenuClick: () => void; t: any; onLanguageToggle: () => void }) => {
   const [current, setCurrent] = useState(0);
-  const slides = t.slides;
+  const slides: any[] = t.slides;
   
   const next = () => setCurrent(p => (p === slides.length - 1 ? 0 : p + 1));
   const prev = () => setCurrent(p => (p === 0 ? slides.length - 1 : p - 1));
