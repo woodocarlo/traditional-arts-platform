@@ -1,0 +1,395 @@
+[
+  {
+    "title": "Product Tabletop Setup",
+    "image_url": "https://i.postimg.cc/yd5zfKPn/Whats-App-Image-2025-09-16-at-23-29-30-3169d2b3.jpg",
+    "props": ["White tabletop", "Silver reflector"],
+    "settings": {
+      "ISO": "100",
+      "Aperture": "f/8",
+      "Shutter": "1/125s",
+      "Lens": "50mm",
+      "Camera_Angle": "45°"
+    },
+    "lighting": "Key light: 45° softbox (left), Fill: silver reflector (right)",
+    "phara": "A clean tabletop setup for product photography, perfect for small objects like watches. The angled camera and softbox create balanced lighting with minimal shadows."
+  },
+  {
+    "title": "Food Flat-Lay Tutorial",
+    "image_url": "https://i.postimg.cc/wTD7s4qn/Whats-App-Image-2025-09-16-at-23-29-35-e845e009.jpg",
+    "props": ["Wooden table", "Plated dessert", "Linen napkin", "Fork"],
+    "settings": {
+      "ISO": "200",
+      "Aperture": "f/4",
+      "Shutter": "1/125s",
+      "Lens": "35mm",
+      "Camera_Angle": "90° (top-down)"
+    },
+    "lighting": "Window light from top-left, diffused",
+    "phara": "A classic food photography style using top-down perspective. Simple props like napkins and cutlery enhance storytelling while soft window light makes the dish appetizing."
+  },
+  {
+    "title": "Macro Jewelry Lighting",
+    "image_url": "https://i.postimg.cc/X7gnbR7N/Whats-App-Image-2025-09-16-at-23-29-34-8b4002f9.jpg",
+    "props": ["Ring", "Black velvet cloth", "Tweezers"],
+    "settings": {
+      "ISO": "50",
+      "Aperture": "f/11",
+      "Shutter": "1/200s",
+      "Lens": "90mm Macro",
+      "Camera_Angle": "Low angle"
+    },
+    "lighting": "Backlight for rim, Softbox above 30°, Fill card below",
+    "phara": "Macro setup for capturing sparkle and shine in jewelry. Using velvet reduces reflections, while backlighting and fill cards highlight fine details."
+  },
+  {
+    "title": "Book Still Life Step-by-Step",
+    "image_url": "https://i.postimg.cc/DzSh1mQm/Whats-App-Image-2025-09-16-at-23-29-34-cc9584ed.jpg",
+    "props": ["Hardcover book", "Desk lamp"],
+    "settings": {
+      "ISO": "200",
+      "Aperture": "f/5.6–f/8",
+      "Shutter": "1/125s",
+      "Lens": "Standard 50mm",
+      "Camera_Angle": "Varies (90° flat-lay, 45° low angle)"
+    },
+    "lighting": "Desk lamp warm side-light or ambient light",
+    "phara": "Step-by-step guide to book photography, showing variations in perspective and lighting. Includes post-processing tips for cropping and contrast enhancement."
+  },
+  {
+    "title": "Glassware Reflections Guide",
+    "image_url": "https://i.postimg.cc/fWcNcGd7/Whats-App-Image-2025-09-16-at-23-29-34-85265625.jpg",
+    "props": ["Wine glass", "Reflective surface", "Diffuser", "Polarizer"],
+    "settings": {
+      "ISO": "100",
+      "Aperture": "f/5.6",
+      "Shutter": "1/160s",
+      "Lens": "Standard/Macro lens",
+      "Camera_Angle": "Frontal"
+    },
+    "lighting": "Backlight at 60°, Diffuser between light and glass",
+    "phara": "Guide for shooting glass objects without harsh glare. Using a diffuser and polarizer helps control reflections for a polished studio look."
+  },
+  {
+    "title": "Minimalist Composition (Rule of Thirds)",
+    "image_url": "https://i.postimg.cc/BQNfy2MX/Whats-App-Image-2025-09-16-at-23-29-33-b24a2a89.jpg",
+    "props": ["Vintage camera", "Film roll"],
+    "settings": {
+      "ISO": "200",
+      "Aperture": "f/5.6–f/8",
+      "Lens": "50mm",
+      "Camera_Angle": "45°"
+    },
+    "lighting": "Soft window light from left",
+    "phara": "Illustrates rule of thirds composition for balanced still photography. Simple props and natural light create professional-looking images."
+  },
+  {
+    "title": "Plant Translucence (Backlight)",
+    "image_url": "https://i.postimg.cc/MHxg3GB7/Whats-App-Image-2025-09-16-at-23-29-33-a59db7de.jpg",
+    "props": ["Small plant", "Reflector"],
+    "settings": {
+      "ISO": "100",
+      "Aperture": "f/8",
+      "Shutter": "1/200s",
+      "Lens": "50mm Macro",
+      "Camera_Angle": "Close-up"
+    },
+    "lighting": "Backlight at 45° with reflector for fill",
+    "phara": "Backlighting emphasizes the translucence of leaves, making them glow naturally. Reflectors balance exposure by filling shadows."
+  },
+  {
+    "title": "Studio Kit Checklist",
+    "image_url": "https://i.postimg.cc/tJ5wKHdL/Whats-App-Image-2025-09-16-at-23-29-33-22a38e48.jpg",
+    "props": ["Softbox", "Reflector", "Tripod", "Macro lens", "Backdrop"],
+    "settings": {
+      "ISO": "50–200",
+      "Notes": "Tripod recommended for shutter speeds 1/60s or slower"
+    },
+    "lighting": "Standard 45° softbox setup",
+    "phara": "A quick reference guide showing the essential studio tools for small product photography, with settings suggestions for stability and quality."
+  },
+  {
+    "title": "Angle & Perspective Comparison",
+    "image_url": "https://i.postimg.cc/cLj2yhY4/Whats-App-Image-2025-09-16-at-23-29-32-3de00212.jpg",
+    "props": ["Small product"],
+    "settings": {
+      "Top-Down": {"ISO": "200", "Aperture": "f/5.6", "Camera_Angle": "90°"},
+      "Low-Angle": {"ISO": "100", "Aperture": "f/8", "Camera_Angle": "30°"}
+    },
+    "lighting": "Soft diffused light with angle variations",
+    "phara": "Comparison of two common perspectives—top-down for flat-lays and low-angle for dramatic emphasis—highlighting how camera position changes the mood."
+  },
+  {
+    "title": "Macro Texture Emphasis (Fabric)",
+    "image_url": "https://i.postimg.cc/X71DdLsc/Whats-App-Image-2025-09-16-at-23-29-32-af844d0a.jpg",
+    "props": ["Fabric sample", "Cloth clamp"],
+    "settings": {
+      "ISO": "200",
+      "Aperture": "f/2.8",
+      "Lens": "100mm Macro",
+      "Camera_Angle": "Close-up"
+    },
+    "lighting": "Side-light at 60° to emphasize texture",
+    "phara": "Macro close-up of fabric to highlight texture and weave. Shallow depth of field emphasizes fine details while side-light enhances contrast."
+  },
+  {
+    "title": "Minimalist Lens & Settings Cheat-Sheet",
+    "image_url": "https://i.postimg.cc/vBv0Bt1n/Whats-App-Image-2025-09-16-at-23-29-32-834ef749.jpg",
+    "props": ["Cup", "Book", "Flower", "Watch", "Glass"],
+    "settings": {
+      "Varies": "ISO, aperture, and angle suggestions per object"
+    },
+    "lighting": "General soft light recommendations",
+    "phara": "A cheat-sheet style reference offering quick photography suggestions for different everyday objects."
+  },
+  {
+    "title": "Luxury Product on Black Acrylic",
+    "image_url": "https://i.postimg.cc/rp1JnNNH/Whats-App-Image-2025-09-16-at-23-29-32-ce04c4e6.jpg",
+    "props": ["Perfume bottle", "Black acrylic base", "Polarizer", "Flag"],
+    "settings": {
+      "ISO": "50",
+      "Aperture": "f/11",
+      "Shutter": "1/160s",
+      "Lens": "50mm",
+      "Camera_Angle": "Frontal"
+    },
+    "lighting": "Softbox high-left, Flag to block spill",
+    "phara": "Luxurious reflective product setup using acrylic base and polarizers to control glare. Perfect for jewelry, perfumes, and premium products."
+  },
+  {
+    "title": "Lighting Angles Chart",
+    "image_url": "https://i.postimg.cc/658hJXhn/Whats-App-Image-2025-09-16-at-23-29-31-3ac3ab14.jpg",
+    "props": ["Generic small object"],
+    "settings": {
+      "ISO": "100–200",
+      "Aperture": "f/5.6–f/11",
+      "Notes": "Pairing recommendations for each angle"
+    },
+    "lighting": "Circular chart of 0°–90° lighting positions",
+    "phara": "Educational chart showing how light angle changes shadows, highlights, and depth for still photography subjects."
+  },
+  {
+    "title": "Before/After Comparison",
+    "image_url": "https://i.postimg.cc/52vqySTt/Whats-App-Image-2025-09-16-at-23-29-31-dd611aa1.jpg",
+    "props": ["Same object photographed twice"],
+    "settings": {
+      "Before": {"ISO": "200", "Aperture": "f/5.6"},
+      "After": {"ISO": "100", "Aperture": "f/8"}
+    },
+    "lighting": "Cluttered vs clean setup with side-diffused light",
+    "phara": "Visual guide showing how small adjustments—removing clutter, controlling light, and tweaking settings—dramatically improve the result."
+  },
+  {
+    "title": "Creative Props & Storytelling",
+    "image_url": "https://i.postimg.cc/zfxLGLzB/Whats-App-Image-2025-09-16-at-23-29-31-be50d2e3.jpg",
+    "props": ["Teacup", "Open book", "Glasses"],
+    "settings": {
+      "ISO": "400",
+      "Aperture": "f/2.8",
+      "Lens": "50mm",
+      "Camera_Angle": "45°"
+    },
+    "lighting": "Window light from right with diffuser, Warm WB ~3200K",
+    "phara": "Demonstrates how simple home props like books and glasses can add storytelling depth to a still-life setup, enhancing mood and theme."
+  },
+  [
+  {
+    "title": "Foil as Reflector (Vector)",
+    "image_url": "https://i.postimg.cc/mgrHvfWC/Whats-App-Image-2025-09-16-at-23-57-48-152735bf.jpg",
+    "props": ["Aluminum foil on cardboard", "Desk lamp", "Toy figurine"],
+    "settings": {
+      "ISO": "200",
+      "Aperture": "f/5.6",
+      "Camera Angle": "45°"
+    },
+    "phara": "Using a crumpled foil sheet taped to cardboard, you can bounce extra light onto the subject and reduce harsh shadows. This is a simple and effective way to mimic a professional reflector with everyday items."
+  },
+  {
+    "title": "Bedsheet Backdrop (Photoreal)",
+    "image_url": "https://i.postimg.cc/Hsg0PhL9/Whats-App-Image-2025-09-16-at-23-57-48-37352255.jpg",
+    "props": ["White bedsheet", "Foil-covered book as reflector", "Ceramic mug"],
+    "settings": {
+      "Lens": "35mm",
+      "ISO": "200",
+      "Aperture": "f/4",
+      "Light": "Natural window light from left"
+    },
+    "phara": "A plain bedsheet makes an excellent DIY backdrop, giving a clean look to product shots. Pairing it with a foil reflector helps fill shadows and create a soft, home-studio effect."
+  },
+  {
+    "title": "Torch with Diffuser (Mixed)",
+    "image_url": "https://i.postimg.cc/ht7Szp9N/Whats-App-Image-2025-09-16-at-23-57-45-f5a0758c.jpg",
+    "props": ["Flashlight", "Baking paper", "Stack of books (tripod)", "Watch"],
+    "settings": {
+      "ISO": "400",
+      "Aperture": "f/2.8",
+      "Camera Position": "Front"
+    },
+    "phara": "Covering a torch with baking paper turns it into a soft light source. Combined with a book stack as a tripod, this is a full DIY setup for still-life or product shots."
+  },
+  {
+    "title": "Glass of Water for Light Effects (Photoreal)",
+    "image_url": "https://i.postimg.cc/0jxfmWMn/Whats-App-Image-2025-09-16-at-23-57-47-6415b7ba.jpg",
+    "props": ["Perfume bottle", "Glass of water", "Window sunlight"],
+    "settings": {
+      "Lens": "50mm",
+      "ISO": "200",
+      "Aperture": "f/5.6"
+    },
+    "phara": "Placing a water glass near the subject creates natural refractions and light patterns, adding a dreamy artistic touch to your still-life shots."
+  },
+  {
+    "title": "Colored Paper Background (Vector)",
+    "image_url": "https://i.postimg.cc/qBP0f8fL/Whats-App-Image-2025-09-16-at-23-57-47-21bc3a3b.jpg",
+    "props": ["Colored A4 sheet", "Fruit", "Window light"],
+    "settings": {
+      "ISO": "100",
+      "Aperture": "f/8",
+      "Camera Angle": "45°"
+    },
+    "phara": "A simple colored paper sheet transforms the background and mood of a shot. Great for DIY product styling without investing in professional backdrops."
+  },
+  {
+    "title": "DIY Lightbox from Cardboard (Mixed)",
+    "image_url": "https://i.postimg.cc/gkgDXKYy/Whats-App-Image-2025-09-16-at-23-57-46-ada875d4.jpg",
+    "props": ["Cardboard box", "Tissue paper", "Desk lamp", "Small object"],
+    "settings": {
+      "ISO": "200",
+      "Aperture": "f/8"
+    },
+    "phara": "With just a cardboard box and tissue paper, you can build a DIY lightbox. It diffuses light evenly and eliminates harsh shadows for clean product shots."
+  },
+  {
+    "title": "Kitchen Sieve for Diffusion (Photoreal)",
+    "image_url": "https://i.postimg.cc/1t2xQNtw/Whats-App-Image-2025-09-16-at-23-57-46-7677df5a.jpg",
+    "props": ["Kitchen sieve", "Lamp", "Fruit"],
+    "settings": {
+      "Lens": "35mm",
+      "ISO": "400"
+    },
+    "phara": "Holding a kitchen sieve between the lamp and subject softens light intensity, reducing glare and creating studio-like soft lighting."
+  },
+  {
+    "title": "Mirror for Creative Reflection (Vector)",
+    "image_url": "https://i.postimg.cc/ydJ5vYPd/Whats-App-Image-2025-09-16-at-23-57-46-fb3502d3.jpg",
+    "props": ["Bathroom mirror", "Perfume bottle", "Window light"],
+    "settings": {
+      "Shutter": "1/125s",
+      "Camera Angle": "30°"
+    },
+    "phara": "A mirror adds creative depth and dimension to still-life images, reflecting the product and doubling visual interest."
+  },
+  {
+    "title": "Colored Plastic as Gel (Photoreal)",
+    "image_url": "https://i.postimg.cc/9X7K900g/Whats-App-Image-2025-09-16-at-23-57-45-9996eab5.jpg",
+    "props": ["Colored plastic folder", "Desk lamp", "Plant"],
+    "settings": {
+      "ISO": "800",
+      "Aperture": "f/2.8"
+    },
+    "phara": "Placing colored plastic sheets in front of a light creates DIY gels, letting you add mood and dramatic color tones cheaply."
+  },
+  {
+    "title": "Books as Tripod (Mixed)",
+    "image_url": "https://i.postimg.cc/9QWnsBps/Whats-App-Image-2025-09-16-at-23-57-45-e9a7c7d3.jpg",
+    "props": ["Stack of books", "Smartphone/camera", "Desk lamp", "Toy car"],
+    "settings": {
+      "ISO": "200",
+      "Aperture": "f/4"
+    },
+    "phara": "When you don’t have a tripod, books are a perfect stand-in. Pair with a desk lamp as your key light for sharp and stable shots."
+  },
+  {
+    "title": "CD for Rainbow Reflections (Mixed)",
+    "image_url": "https://i.postimg.cc/sgvNVgkJ/Chat-GPT-Image-Sep-16-2025-01-44-22-PM.png",
+    "props": ["CD/DVD", "Ring", "Desk lamp"],
+    "settings": {
+      "ISO": "100",
+      "Aperture": "f/8"
+    },
+    "phara": "A CD can scatter light into rainbow streaks, adding a striking sparkle to jewelry or small items."
+  },
+  {
+    "title": "White T-Shirt as Diffuser (Photoreal)",
+    "image_url": "https://i.postimg.cc/N00mhKZg/Whats-App-Image-2025-09-16-at-23-57-44-2f579d29.jpg",
+    "props": ["White T-shirt", "Watch", "Window sunlight"],
+    "settings": {
+      "Lens": "35mm",
+      "ISO": "400",
+      "Aperture": "f/2.8"
+    },
+    "phara": "Sunlight filtered through a plain white T-shirt gives a natural, soft, diffused effect for portraits and still objects."
+  },
+  {
+    "title": "Fairy Lights for Bokeh (Vector)",
+    "image_url": "https://i.postimg.cc/N0WMNLcC/Whats-App-Image-2025-09-16-at-23-57-43-72919f16.jpg",
+    "props": ["Fairy lights", "Cup"],
+    "settings": {
+      "Aperture": "f/1.8",
+      "Shutter": "1/60s"
+    },
+    "phara": "String lights in the background create beautiful out-of-focus bokeh effects, great for cozy storytelling shots."
+  },
+  {
+    "title": "Tissue Paper Color Gel (Photoreal)",
+    "image_url": "https://i.postimg.cc/4NLXLnvv/Whats-App-Image-2025-09-16-at-23-57-43-eb9fe67f.jpg",
+    "props": ["Red tissue paper", "Desk lamp", "Your craft"],
+    "settings": {
+      "ISO": "800",
+      "Aperture": "f/2.8"
+    },
+    "phara": "Colored tissue paper over a lamp is an easy DIY gel to tint your scene with vibrant hues."
+  },
+  {
+    "title": "Umbrella as Diffuser (Vector)",
+    "image_url": "https://i.postimg.cc/7ZJrK9ZD/Whats-App-Image-2025-09-16-at-23-57-43-75b7749f.jpg",
+    "props": ["Umbrella", "Sunlight", "Object"],
+    "settings": {
+      "ISO": "200",
+      "Aperture": "f/5.6",
+      "Camera Angle": "45°"
+    },
+    "phara": "A simple umbrella can work as a large diffuser, softening sunlight and reducing harsh shadows outdoors."
+  },
+  {
+    "title": "Curtains as Backdrop (Photoreal)",
+    "image_url": "https://i.postimg.cc/gj5m0T2S/Whats-App-Image-2025-09-16-at-23-57-43-170f1bab.jpg",
+    "props": ["Curtain", "Toy", "Window sunlight"],
+    "settings": {
+      "ISO": "100",
+      "Aperture": "f/4"
+    },
+    "phara": "Patterned curtains serve as an instant, textured backdrop for creative DIY photoshoots."
+  },
+  {
+    "title": "Cardboard Tube as Snoot (Mixed)",
+    "image_url": "https://i.postimg.cc/mg07CXK9/Whats-App-Image-2025-09-16-at-23-57-47-475f1950.jpg",
+    "props": ["Cardboard tube", "Lamp", "Fruit"],
+    "settings": {
+      "Shutter": "1/125s",
+      "Aperture": "f/8"
+    },
+    "phara": "Attaching a cardboard tube to a lamp narrows the beam, creating dramatic spotlight effects on the subject."
+  },
+  {
+  "title": "Aperture and Depth of Field (Vector)",
+  "image_url": "https://i.postimg.cc/zfXhKyks/Whats-App-Image-2025-09-17-at-00-45-39-a0ec223d.jpg",
+  "props": ["Camera", "Red rose"],
+  "settings": {
+    "Large Aperture": "f/2.8",
+    "Small Aperture": "f/16"
+  },
+  "phara": "Using a large aperture (f/2.8) creates a shallow depth of field with a blurred background, while a small aperture (f/16) keeps both subject and background in focus."
+},
+{
+  "title": "Rule of Thirds with Props (Vector)",
+  "image_url": "https://i.postimg.cc/sg963HK3/Whats-App-Image-2025-09-17-at-00-45-38-3f5b0b53.jpg",
+  "props": ["Book stack", "Green apple", "Camera", "Soft light source"],
+  "settings": {
+    "Lens": "50mm",
+    "Aperture": "f/4",
+    "Angle": "Eye-level (45°)"
+  },
+  "phara": "Placing the apple on a stack of books and aligning it with the rule of thirds grid creates balanced composition. A soft light from the left enhances the subject."
+}
+]
+]
