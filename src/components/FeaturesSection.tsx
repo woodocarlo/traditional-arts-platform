@@ -3,34 +3,10 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { Translation } from '../types';
+import { BrushIcon, ImageIcon, GrowthIcon, VideoCameraIcon } from './icons';
 
-// --- Icon Components ---
-const BrushIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-purple-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM7 3V1a1 1 0 011-1h1a1 1 0 011 1v2M7 21h10a2 2 0 002-2v-2a2 2 0 00-2-2H7" />
-  </svg>
-);
-
-const ImageIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-  </svg>
-);
-
-const GrowthIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-orange-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-  </svg>
-);
-
-const VideoCameraIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-amber-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-  </svg>
-);
-
-const FeaturesSection = ({ t }: { t: any }) => {
+const FeaturesSection = ({ t }: { t: Translation }) => {
   return (
     <section id="features" className="py-20 bg-[#4D080F] relative overflow-hidden">
       <div className="relative z-10">

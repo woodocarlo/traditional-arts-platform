@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 
 
-import { Header } from './HeroSection';
+import Header from './Header';
 // import UploadModal from './UploadModal';
 
 interface SideNavProps {
@@ -75,15 +75,7 @@ const UploadIcon = () => (
   </svg>
 );
 
-// --- Localization Data ---
-const translations = {
-  en: {
-    features: "Features", signUp: "Sign Up", instructions: "Instructions", prototypeNotes: "Prototype Notes",
-  },
-  hi: {
-    features: "विशेषताएँ", signUp: "साइन अप करें", instructions: "निर्देश", prototypeNotes: "प्रोटोटाइप नोट्स",
-  }
-};
+import { translations } from '../lib/translations';
 
 // Sample gallery items
 const galleryItems = [

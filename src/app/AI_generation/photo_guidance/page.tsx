@@ -1,6 +1,8 @@
 "use client";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
+// FIX: Import the next/image component
+import Image from "next/image";
 import allGuidesData from "../../../../public/assets/props.json";
 
 // --- Icons for UI actions ---
@@ -82,6 +84,7 @@ type Guide = {
   phara: string;
   props?: string[];
   lighting?: string;
+  // FIX: Replaced 'any' with 'unknown' for better type safety.
   settings?: Record<string, unknown>;
 };
 
@@ -89,6 +92,7 @@ type Guide = {
 const GuideCard = ({ guide }: { guide: Guide }) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
+  // FIX: Changed 'any' to 'unknown' to match the updated Guide type.
   const renderSettings = (settings: Record<string, unknown> | undefined) => {
     if (!settings) return null;
     return Object.entries(settings).map(([key, value]) => (
@@ -101,10 +105,13 @@ const GuideCard = ({ guide }: { guide: Guide }) => {
   return (
     <div className="relative bg-gray-900/80 rounded-xl overflow-hidden border border-white/10 transition-all duration-300 hover:shadow-lg hover:border-purple-400/50 flex flex-col">
       <div className="relative aspect-[4/3]">
-        <img
+        {/* FIX: Replaced <img> with next/image's <Image> for optimization */}
+        <Image
           src={guide.image_url}
           alt={guide.title}
-          className="w-full h-full object-contain bg-black transition-transform duration-500 group-hover:scale-105"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="object-contain bg-black transition-transform duration-500 group-hover:scale-105"
         />
       </div>
       <div className="p-4 flex flex-col">
@@ -166,7 +173,7 @@ export default function PhotoGuidance() {
     const preloadImages = nextGuides.map(
       (guide) =>
         new Promise((res) => {
-          const img = new Image();
+          const img = new window.Image();
           img.src = guide.image_url;
           img.onload = res;
           img.onerror = res;
@@ -183,6 +190,7 @@ export default function PhotoGuidance() {
 
   useEffect(() => {
     shuffleGuides();
+    // FIX: Added 'shuffleGuides' to the dependency array to satisfy the linter.
   }, [shuffleGuides]);
 
   return (

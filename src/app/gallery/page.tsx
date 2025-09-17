@@ -2,7 +2,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Header, SideNav } from '../../components/HeroSection';
+import Image from 'next/image';
+import Header from '../../components/Header';
+import SideNav from '../../components/SideNav';
 import UploadModal from '../../components/UploadModal';
 import UploadButton from './upload';
 
@@ -39,17 +41,8 @@ interface UploadedFile {
   errorMessage?: string;
 }
 
-interface Translations {
-  [key: string]: {
-    features: string;
-    signUp: string;
-    instructions: string;
-    prototypeNotes: string;
-    note1: string;
-    note2: string;
-    note3: string;
-  };
-}
+import { translations } from '../../lib/translations';
+import { Translation } from '../../types';
 
 // --- Background Image Data (Using Public Assets) ---
 const overlayImages = [
@@ -71,20 +64,23 @@ const imagePlacements = [
 const RoyalBackground = () => (
   <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
     {imagePlacements.map((style, index) => (
-      <img
+      <Image
         key={index}
         src={overlayImages[index % overlayImages.length]}
         alt=""
+        width={256}
+        height={256}
         className={`absolute mix-blend-luminosity opacity-60 ${
           index % 2 === 0 ? 'w-36 md:w-48' : 'w-56 md:w-72'
         }`}
         style={{
-          top: style.top, left: style.left,
+          top: style.top, 
+          left: style.left,
           transform: `rotate(${style.rotate}deg) scale(${style.scale})`,
         }}
-        onError={(e) => {
-          e.currentTarget.onerror = null;
-          e.currentTarget.src="https://placehold.co/256x256/054B09/FFFFFF?text=Image"
+        onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+          const target = e.currentTarget;
+          target.src = "https://placehold.co/256x256/054B09/FFFFFF?text=Image";
         }}
       />
     ))}
@@ -98,27 +94,7 @@ const BackIcon = () => (
   </svg>
 );
 
-// --- Localization Data ---
-const translations = {
-  en: {
-    features: "Features", 
-    signUp: "Sign Up", 
-    instructions: "Instructions", 
-    prototypeNotes: "Prototype Notes",
-    note1: "Upload your artwork to showcase your talent",
-    note2: "Gallery supports images, videos, and audio files", 
-    note3: "Your uploads are stored locally for easy access",
-  },
-  hi: {
-    features: "विशेषताएँ", 
-    signUp: "साइन अप करें", 
-    instructions: "निर्देश", 
-    prototypeNotes: "प्रोटोटाइप नोट्स",
-    note1: "अपनी कलाकृति अपलोड करें और अपनी प्रतिभा दिखाएं",
-    note2: "गैलरी में चित्र, वीडियो और ऑडियो फ़ाइलें समर्थित हैं",
-    note3: "आपकी अपलोड स्थानीय रूप से संग्रहीत होती हैं",
-  }
-};
+
 
 // Sample gallery items
 const galleryItems: GalleryItem[] = [
@@ -152,9 +128,11 @@ const ImageModal = ({ item, isOpen, onClose }: { item: GalleryItem | null, isOpe
         <div className="w-full h-full flex flex-col">
           <div className="flex-1 flex items-center justify-center p-4">
             {item.type === 'image' || !item.type ? (
-              <img 
+              <Image 
                 src={item.src} 
                 alt={item.alt} 
+                width={800}
+                height={600}
                 className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
               />
             ) : item.type === 'video' ? (
@@ -297,7 +275,7 @@ export default function GalleryPage() {
         id: file.id ?? Date.now(),
         src: file.src ?? '',
         alt: file.alt ?? file.name ?? 'Uploaded Art',
-                  type: (file.type as GalleryItem['type']) ?? undefined,
+        type: (file.type as GalleryItem['type']) ?? undefined,
         posts: 0,
         purchases: 0,
         date: new Date().toISOString().split('T')[0],
@@ -581,12 +559,15 @@ export default function GalleryPage() {
         </div>
         
         <div className="relative z-10 pt-20">
-          <img
+          <Image
               src='/assets/backgrounds/peacock.png'
               alt=""
+              width={320}
+              height={320}
               className="absolute top-40 left-4 md:left-12 lg:left-20 w-56 md:w-72 lg:w-80 transform -rotate-12 opacity-70 hidden sm:block pointer-events-none z-5"
-              onError={(e) => {
-                e.currentTarget.src = 'https://i.postimg.cc/cLsbbXqH/Add-a-little-bit-of-body-text-1.png';
+              onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                const target = e.currentTarget;
+                target.src = 'https://i.postimg.cc/cLsbbXqH/Add-a-little-bit-of-body-text-1.png';
               }}
           />
           
@@ -644,13 +625,15 @@ export default function GalleryPage() {
                       >
                         <div onClick={() => handleImageClick(item)}>
                           {item.type === 'image' || !item.type ? (
-                            <img 
+                            <Image 
                               src={item.src} 
                               alt={item.alt} 
+                              width={400}
+                              height={300}
                               className="gallery-item-img"
-                              onError={(e) => {
-                                e.currentTarget.onerror = null;
-                                e.currentTarget.src = 'https://placehold.co/400x300/1E293B/FFFFFF?text=Art';
+                              onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                                const target = e.currentTarget;
+                                target.src = 'https://placehold.co/400x300/1E293B/FFFFFF?text=Art';
                               }}
                             />
                           ) : item.type === 'video' ? (
