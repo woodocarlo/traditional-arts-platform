@@ -196,7 +196,33 @@ export default function GalleryPage() {
   const t = translations[language];
 
   useEffect(() => {
-    setInstructions("Welcome to your Art Gallery! Here you can upload, manage and showcase your traditional artwork. Use the tabs above to switch between photos, videos, and audio content. Click on any item to view details or create social media posts.");
+    setInstructions(
+      <>
+        <h2 className="text-xl font-bold text-gray-100">Gallery Instructions</h2>
+        <ul className="space-y-2 list-disc list-inside text-gray-300">
+          <li>
+            <p className="text-gray-300">
+              The Art Gallery is your personal sanctuary for managing and promoting your masterpieces.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>Comprehensive Media Upload:</strong> Upload your artwork photos, videos, or even audio recordings of your legacy story (which can be used for future podcast generation).
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>Instant Post Creation Prompt:</strong> Upon image upload, you'll be prompted with the option to immediately create a social media post for that artwork.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>Smart Price Optimization Input:</strong> Define a minimum acceptable selling price for your crafts; our AI will then intelligently optimize the pricing to maximize sales while ensuring your profitability.
+            </p>
+          </li>
+        </ul>
+      </>
+    );
   }, [setInstructions]);
 
   // Load uploaded files from localStorage on component mount
@@ -235,8 +261,8 @@ export default function GalleryPage() {
                   alt: file.name,
                   name: file.name,
                   type: file.type.startsWith('image/') ? 'image' :
-                        file.type.startsWith('video/') ? 'video' :
-                        file.type.startsWith('audio/') ? 'audio' : undefined,
+                         file.type.startsWith('video/') ? 'video' :
+                         file.type.startsWith('audio/') ? 'audio' : undefined,
                   timestamp: timestamp,
                   date: new Date().toISOString().split('T')[0],
                   posts: 0,
@@ -713,8 +739,8 @@ export default function GalleryPage() {
                         <h3 className="text-sm font-semibold text-white truncate">{item.alt}</h3>
                         <p className="text-slate-400 text-xs">
                           {item.isUserUpload ? 'Your Upload' : 
-                           item.type === 'video' ? 'Video Content' :
-                           item.type === 'audio' ? 'Audio Content' : 'Traditional Indian Art'}
+                            item.type === 'video' ? 'Video Content' :
+                            item.type === 'audio' ? 'Audio Content' : 'Traditional Indian Art'}
                         </p>
                       </div>
                     </div>

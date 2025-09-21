@@ -107,96 +107,96 @@ export default function KalaSakhiLandingPage() {
 
     // ...inside the useEffect hook of your component
 
-const sectionInstructions = {
-  default: (
-    <>
-      <InstructionsHeader />
-      <ul className="space-y-2 list-disc list-inside text-gray-300">
-        <li>
-          <strong>Integrated Creative Suite:</strong> Access core features
-          including automated Social Media Post Generation, personalized
-          Podcast Creation, and expert Photography Guidance.
-        </li>
-        <li>
-          <strong>"Create Your Own Post" Studio:</strong> Utilize an
-          intuitive canvas editor, empowered by a vast library of stock
-          images and AI-generated visuals from Gemini, to craft and
-          customize unique posts.
-        </li>
-      </ul>
-    </>
-  ),
-  1: (
-    <>
-      <InstructionsHeader />
-      <ul className="space-y-2 list-disc list-inside text-gray-300">
-        <li>
-          <strong>Language Selection:</strong> Choose from a wide array of
-          languages for your podcast.
-        </li>
-        <li>
-          <strong>Duration Control:</strong> Define the desired length of your
-          podcast.
-        </li>
-        <li>
-          <strong>Audio-Visual Options:</strong> Select between audio-only or
-          an A/V podcast. (Note: Face-cloning is not implemented in this
-          prototype).
-        </li>
-        <li>
-          <strong>Content Generation:</strong> Opt for a fully AI-generated
-          script, or input specific questions to guide the AI.
-        </li>
-      </ul>
-    </>
-  ),
-  4: (
-    <>
-      <InstructionsHeader />
-      <ul className="space-y-2 list-disc list-inside text-gray-300">
-        <li>
-          <strong>Artwork Selection:</strong> Choose the specific art or
-          craft piece you wish to promote.
-        </li>
-        <li>
-          <strong>Aspect Ratio:</strong> Select the optimal aspect ratio for
-          your desired social media platform.
-        </li>
-        <li>
-        <strong>AI-Powered Generation:</strong> Instantly generate posts with
-          trending hashtags and engaging captions.
-        </li>
-        <li>
-          <strong>Iterate:</strong> Easily generate more variations if you're not
-          satisfied.
-        </li>
-      </ul>
-    </>
-  ),
-  3: (
-    <>
-      <InstructionsHeader />
-      <ul className="space-y-2 list-disc list-inside text-gray-300">
-        <li>
-          <strong>"Studio at Home" Guidance:</strong> Learn to capture
-          professional, studio-quality photos using just a smartphone.
-        </li>
-        <li>
-          <strong>Visual & Detailed Instructions:</strong> Each tip includes
-          clear graphics, step-by-step methods, and recommended camera
-          settings.
-        </li>
-      </ul>
-    </>
-  )
-};
+    const sectionInstructions = {
+      default: (
+        <>
+          <InstructionsHeader />
+          <ul className="space-y-2 list-disc list-inside text-gray-300">
+            <li>
+              <strong>Integrated Creative Suite:</strong> Access core features
+              including automated Social Media Post Generation, personalized
+              Podcast Creation, and expert Photography Guidance.
+            </li>
+            <li>
+              <strong>&quot;Create Your Own Post&quot; Studio:</strong> Utilize an
+              intuitive canvas editor, empowered by a vast library of stock
+              images and AI-generated visuals from Gemini, to craft and
+              customize unique posts.
+            </li>
+          </ul>
+        </>
+      ),
+      1: (
+        <>
+          <InstructionsHeader />
+          <ul className="space-y-2 list-disc list-inside text-gray-300">
+            <li>
+              <strong>Language Selection:</strong> Choose from a wide array of
+              languages for your podcast.
+            </li>
+            <li>
+              <strong>Duration Control:</strong> Define the desired length of your
+              podcast.
+            </li>
+            <li>
+              <strong>Audio-Visual Options:</strong> Select between audio-only or
+              an A/V podcast. (Note: Face-cloning is not implemented in this
+              prototype).
+            </li>
+            <li>
+              <strong>Content Generation:</strong> Opt for a fully AI-generated
+              script, or input specific questions to guide the AI.
+            </li>
+          </ul>
+        </>
+      ),
+      4: (
+        <>
+          <InstructionsHeader />
+          <ul className="space-y-2 list-disc list-inside text-gray-300">
+            <li>
+              <strong>Artwork Selection:</strong> Choose the specific art or
+              craft piece you wish to promote.
+            </li>
+            <li>
+              <strong>Aspect Ratio:</strong> Select the optimal aspect ratio for
+              your desired social media platform.
+            </li>
+            <li>
+              <strong>AI-Powered Generation:</strong> Instantly generate posts with
+              trending hashtags and engaging captions.
+            </li>
+            <li>
+              <strong>Iterate:</strong> Easily generate more variations if you&apos;re not
+              satisfied.
+            </li>
+          </ul>
+        </>
+      ),
+      3: (
+        <>
+          <InstructionsHeader />
+          <ul className="space-y-2 list-disc list-inside text-gray-300">
+            <li>
+              <strong>&quot;Studio at Home&quot; Guidance:</strong> Learn to capture
+              professional, studio-quality photos using just a smartphone.
+            </li>
+            <li>
+              <strong>Visual & Detailed Instructions:</strong> Each tip includes
+              clear graphics, step-by-step methods, and recommended camera
+              settings.
+            </li>
+          </ul>
+        </>
+      )
+    };
 
-// Set the instructions, defaulting to the main view if no section is expanded
-setInstructions(
-  sectionInstructions[expandedSection as keyof typeof sectionInstructions] ||
-  sectionInstructions.default
-);
-}, [expandedSection, setInstructions]);
+    // Set the instructions, defaulting to the main view if no section is expanded
+    setInstructions(
+      sectionInstructions[expandedSection as keyof typeof sectionInstructions] ||
+      sectionInstructions.default
+    );
+  }, [expandedSection, setInstructions]);
 
   const cardData = [
     {

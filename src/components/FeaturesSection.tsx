@@ -52,7 +52,7 @@ const FeaturesSection = ({ t }: { t: Translation }) => {
           <Link href="/gallery" passHref>
             <div className="relative group bg-gradient-to-br from-green-900/80 to-emerald-900/80 p-6 rounded-2xl backdrop-blur-sm border border-green-700/30 hover:border-green-500/50 transition-all duration-300 hover:scale-105 shadow-2xl cursor-pointer">
               <img 
-                src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=400&auto-format&fit=crop"
+                src="https://i.postimg.cc/T3hXbZ5X/image.png"
                 onError={(e) => { const img = e.currentTarget as HTMLImageElement; img.onerror = null; img.src = 'https://placehold.co/400x300/1E293B/FFFFFF?text=Gallery'; }}
                 alt="Art gallery background" 
                 className="absolute inset-0 h-full w-full object-cover opacity-20 group-hover:opacity-35 transition-opacity duration-300" 
