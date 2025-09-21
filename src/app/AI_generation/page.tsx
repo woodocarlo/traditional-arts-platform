@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import CreatePostSection from "./CreatePostSection";
 import PostGeneration from "./post_generation/page";
 import PhotoGuidance from "./photo_guidance/page";
+import { useInstructions } from "@/contexts/InstructionsContext";
 
 // An inline SVG for the back arrow icon
 const BackArrowIcon = () => (
@@ -91,66 +92,164 @@ export default function KalaSakhiLandingPage() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [expandedSection, setExpandedSection] = useState<number | null>(null);
   const expandedSectionRef = useRef<HTMLDivElement | null>(null);
+  const { setInstructions } = useInstructions();
 
-    const cardData = [
-      {
-        id: 1,
-        title: "Create a Podcast",
-        details:
-          "Transform your craft stories into engaging audio content. Our AI-powered podcast creator helps you script, record, and edit professional-quality podcasts about your traditional art. Share the history, techniques, and passion behind your work with a global audience.",
-        buttonText: "Start Recording",
-        image:
-          "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-        Icon: PodcastIcon,
-      },
-      {
-        id: 4,
-        title: "Social Media Posts",
-        details:
-          "Effortlessly create stunning social media content that showcases your traditional crafts. Our AI assistant generates captivating captions, and creates visually appealing layouts. From Instagram stories to Facebook posts, reach thousands of potential customers with professionally crafted content that tells your unique story and drives sales.",
-         buttonText: "Generate Posts",
-        image:
-          "https://images.unsplash.com/photo-1611162617474-5b21e879e113?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-        Icon: SocialMediaIcon,
-      },
-      {
-        id: 3,
-        title: "Photography Guidance",
-        details:
-          "Capture stunning photos of your crafts with AI-powered guidance. Get real-time suggestions for lighting, angles, composition, and staging to make your art pieces look museum-worthy, using either a smartphone or professional camera",
-        buttonText: "Get Photo Tips",
-        image:
-          "https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-        Icon: CameraIcon,
-      },
-      {
-        id: 5,
-        title: "Create Your Own Post",
-        details:
-          "Design and customize your marketing materials with our intuitive editor. Mix and match templates, add your own images, write compelling copy, and create everything from business cards to promotional flyers. Full creative control with AI assistance to ensure your brand stays authentic to your traditional roots while appealing to modern audiences.",
-        buttonText: "Coming Soon",
-        image:
-          "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-        Icon: EditIcon,
-      },
-    ];
+  // Update instructions based on expanded section
+  useEffect(() => {
+    // A reusable header component for consistent styling
+    const InstructionsHeader = () => (
+      <div className="mb-3">
+        <h3 className="font-semibold text-lg tracking-wide uppercase text-purple-300">
+          Instructions for Prototype
+        </h3>
+      </div>
+    );
+
+    // ...inside the useEffect hook of your component
+
+const sectionInstructions = {
+  default: (
+    <>
+      <InstructionsHeader />
+      <ul className="space-y-2 list-disc list-inside text-gray-300">
+        <li>
+          <strong>Integrated Creative Suite:</strong> Access core features
+          including automated Social Media Post Generation, personalized
+          Podcast Creation, and expert Photography Guidance.
+        </li>
+        <li>
+          <strong>"Create Your Own Post" Studio:</strong> Utilize an
+          intuitive canvas editor, empowered by a vast library of stock
+          images and AI-generated visuals from Gemini, to craft and
+          customize unique posts.
+        </li>
+      </ul>
+    </>
+  ),
+  1: (
+    <>
+      <InstructionsHeader />
+      <ul className="space-y-2 list-disc list-inside text-gray-300">
+        <li>
+          <strong>Language Selection:</strong> Choose from a wide array of
+          languages for your podcast.
+        </li>
+        <li>
+          <strong>Duration Control:</strong> Define the desired length of your
+          podcast.
+        </li>
+        <li>
+          <strong>Audio-Visual Options:</strong> Select between audio-only or
+          an A/V podcast. (Note: Face-cloning is not implemented in this
+          prototype).
+        </li>
+        <li>
+          <strong>Content Generation:</strong> Opt for a fully AI-generated
+          script, or input specific questions to guide the AI.
+        </li>
+      </ul>
+    </>
+  ),
+  4: (
+    <>
+      <InstructionsHeader />
+      <ul className="space-y-2 list-disc list-inside text-gray-300">
+        <li>
+          <strong>Artwork Selection:</strong> Choose the specific art or
+          craft piece you wish to promote.
+        </li>
+        <li>
+          <strong>Aspect Ratio:</strong> Select the optimal aspect ratio for
+          your desired social media platform.
+        </li>
+        <li>
+        <strong>AI-Powered Generation:</strong> Instantly generate posts with
+          trending hashtags and engaging captions.
+        </li>
+        <li>
+          <strong>Iterate:</strong> Easily generate more variations if you're not
+          satisfied.
+        </li>
+      </ul>
+    </>
+  ),
+  3: (
+    <>
+      <InstructionsHeader />
+      <ul className="space-y-2 list-disc list-inside text-gray-300">
+        <li>
+          <strong>"Studio at Home" Guidance:</strong> Learn to capture
+          professional, studio-quality photos using just a smartphone.
+        </li>
+        <li>
+          <strong>Visual & Detailed Instructions:</strong> Each tip includes
+          clear graphics, step-by-step methods, and recommended camera
+          settings.
+        </li>
+      </ul>
+    </>
+  )
+};
+
+// Set the instructions, defaulting to the main view if no section is expanded
+setInstructions(
+  sectionInstructions[expandedSection as keyof typeof sectionInstructions] ||
+  sectionInstructions.default
+);
+}, [expandedSection, setInstructions]);
+
+  const cardData = [
+    {
+      id: 1,
+      title: "Create a Podcast",
+      details:
+        "Transform your craft stories into engaging audio content. Our AI-powered podcast creator helps you script, record, and edit professional-quality podcasts about your traditional art. Share the history, techniques, and passion behind your work with a global audience.",
+      buttonText: "Start Recording",
+      image:
+        "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      Icon: PodcastIcon,
+    },
+    {
+      id: 4,
+      title: "Social Media Posts",
+      details:
+        "Effortlessly create stunning social media content that showcases your traditional crafts. Our AI assistant generates captivating captions, and creates visually appealing layouts. From Instagram stories to Facebook posts, reach thousands of potential customers with professionally crafted content that tells your unique story and drives sales.",
+      buttonText: "Generate Posts",
+      image:
+        "https://images.unsplash.com/photo-1611162617474-5b21e879e113?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      Icon: SocialMediaIcon,
+    },
+    {
+      id: 3,
+      title: "Photography Guidance",
+      details:
+        "Capture stunning photos of your crafts with AI-powered guidance. Get real-time suggestions for lighting, angles, composition, and staging to make your art pieces look museum-worthy, using either a smartphone or professional camera",
+      buttonText: "Get Photo Tips",
+      image:
+        "https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      Icon: CameraIcon,
+    },
+    {
+      id: 5,
+      title: "Create Your Own Post",
+      details:
+        "Design and customize your marketing materials with our intuitive editor. Mix and match templates, add your own images, write compelling copy, and create everything from business cards to promotional flyers. Full creative control with AI assistance to ensure your brand stays authentic to your traditional roots while appealing to modern audiences.",
+      buttonText: "Coming Soon",
+      image:
+        "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      Icon: EditIcon,
+    },
+  ];
 
   const handleCardClick = (cardId: number) => {
     if (expandedSection === cardId) {
       setExpandedSection(null);
     } else {
       setExpandedSection(cardId);
-      setTimeout(() => {
-        if (expandedSectionRef.current) {
-          (expandedSectionRef.current as HTMLElement).scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-        }
-      }, 100);
     }
   };
-
+  
+  // Scroll into view when a section is expanded
   useEffect(() => {
     if (expandedSection && expandedSectionRef.current) {
       const timer = setTimeout(() => {
@@ -160,10 +259,11 @@ export default function KalaSakhiLandingPage() {
             block: "start",
           });
         }
-      }, 200);
+      }, 200); // A small delay ensures the element is rendered before scrolling
       return () => clearTimeout(timer);
     }
   }, [expandedSection]);
+
 
   return (
     <>
@@ -200,7 +300,7 @@ export default function KalaSakhiLandingPage() {
           onClick={() => window.history.back()}
           className="
             absolute 
-            top-8 
+            top-24 
             left-8 
             flex 
             items-center 
@@ -270,7 +370,7 @@ export default function KalaSakhiLandingPage() {
                   }}
                 />
 
-                {/* Content - UPDATED SECTION */}
+                {/* Content */}
                 <div className="relative z-10 flex flex-col justify-between items-center h-full w-full p-6">
                   {/* Top Section: Icon and Title */}
                   <div className="text-center">

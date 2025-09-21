@@ -4,7 +4,7 @@ import axios from "axios";
 import assets from "./stock.json";
 
 // Placeholder for API keys (use environment variables in production)
-const REMOVE_BG_API_KEY = process.env.NEXT_PUBLIC_REMOVE_BG_API_KEY || "nRffN4sYDj28VMJpNtXuMopL";
+const REMOVE_BG_API_KEY = process.env.NEXT_PUBLIC_REMOVE_BG_API_KEY || " rnYsL35fBiWXmzFF4XxdRULo";
 const GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY || "AIzaSyDZ5S69ygJDM1eJFxvV6AqCEUtl9Uqryiw"
 
 // Icons for the UI

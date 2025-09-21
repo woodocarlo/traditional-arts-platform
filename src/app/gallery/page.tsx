@@ -7,6 +7,7 @@ import Header from '../../components/Header';
 import SideNav from '../../components/SideNav';
 import UploadModal from '../../components/UploadModal';
 import UploadButton from './upload';
+import { useInstructions } from '@/contexts/InstructionsContext';
 
 // Type definitions
 interface GalleryItem {
@@ -190,8 +191,13 @@ export default function GalleryPage() {
   const [uploadedFiles, setUploadedFiles] = useState<GalleryItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const { setInstructions } = useInstructions();
 
   const t = translations[language];
+
+  useEffect(() => {
+    setInstructions("Welcome to your Art Gallery! Here you can upload, manage and showcase your traditional artwork. Use the tabs above to switch between photos, videos, and audio content. Click on any item to view details or create social media posts.");
+  }, [setInstructions]);
 
   // Load uploaded files from localStorage on component mount
   useEffect(() => {
