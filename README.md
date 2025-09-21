@@ -15,7 +15,6 @@
   <img src="https://img.shields.io/github/stars/woodocarlo/traditional-arts-platform?style=for-the-badge" />
   <img src="https://img.shields.io/github/forks/woodocarlo/traditional-arts-platform?style=for-the-badge" />
   <img src="https://img.shields.io/github/issues/woodocarlo/traditional-arts-platform?style=for-the-badge" />
-  <img src="https://img.shields.io/github/license/woodocarlo/traditional-arts-platform?style=for-the-badge" />
 </div>
 
 <br />
@@ -100,6 +99,6 @@ Please fork the repo and create a pull request. You can also simply open an issu
 
 ## 💬 Contact
 
-Nischal Sharma - [@linkedin](https://www.linkedin.com/in/nischal-sharma-49692025b/) - [@Gmail](nischalsharma2037@gmail.com)
+Nischal Sharma - [@linkedin](https://www.linkedin.com/in/nischal-sharma-49692025b/) - [@Gmail](mailto:nischalsharma2037@gmail.com)
 
 Project Link: [https://github.com/woodocarlo/traditional-arts-platform](https://github.com/woodocarlo/traditional-arts-platform)
