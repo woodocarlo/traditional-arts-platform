@@ -212,8 +212,8 @@ export default function GalleryPage() {
           </li>
           <li>
             <p>
-              <strong>Instant Post Creation Prompt:</strong> Upon image upload, you'll be prompted with the option to immediately create a social media post for that artwork.
-            </p>
+            <strong>Instant Post Creation Prompt:</strong> Upon image upload, you&apos;ll be prompted with the option to immediately create a social media post for that artwork.
+          </p>
           </li>
           <li>
             <p>
