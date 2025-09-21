@@ -96,16 +96,10 @@ Contributions are what make the open-source community such an amazing place to l
 
 Please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
 
----
 
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE.txt` for more information.
-
----
 
 ## 💬 Contact
 
-Carlo Woodo - [@your_twitter_handle](https://twitter.com/your_twitter_handle) - your.email@example.com
+Nischal Sharma - [@linkedin](https://www.linkedin.com/in/nischal-sharma-49692025b/) - [@Gmail](nischalsharma2037@gmail.com)
 
 Project Link: [https://github.com/woodocarlo/traditional-arts-platform](https://github.com/woodocarlo/traditional-arts-platform)
