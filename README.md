@@ -1,8 +1,8 @@
 <div align="center">
-  <img src="https://your-logo-url.com/logo.png" alt="Kalasakhi Logo" width="100" />
+  <img src="https://i.postimg.cc/CxcHHGGp/image.png" alt="Kalasakhi Logo" width="150" />
   <h1>Kalasakhi</h1>
   <p>
-    An AI-powered platform designed to empower local artisans by bridging the gap between traditional art and the digital marketplace. From heritage to hashtags.
+    Your AI-Powered Art Friend: Empowering traditional artisans to bridge heritage crafts with the digital world. From timeless traditions to trending hashtags.
   </p>
   <p>
     <a href="https://github.com/woodocarlo/traditional-arts-platform/issues">Report Bug</a>
@@ -19,86 +19,119 @@
 
 <br />
 
+<div align="center">
+  <a href="https://traditional-arts-platform.vercel.app/">
+    <img src="https://img.shields.io/badge/Live%20Demo-Vercel-blue?style=for-the-badge&logo=vercel" alt="Live Demo" />
+  </a>
+  <a href="https://youtu.be/xm7g_fWP_zk?si=VCuAAbJbPWty3yFL">
+    <img src="https://img.shields.io/badge/Watch%20Demo-YouTube-red?style=for-the-badge&logo=youtube" alt="Watch Demo" />
+  </a>
+</div>
+
 ---
 
-## 🎨 About The Project
+## 🎨 About Kalasakhi
 
-Traditional artisans possess incredible talent, but often lack the resources and technical skills to market their creations in the digital age. **Kalasakhi** (meaning 'Art Friend') is an AI-powered assistant that helps artisans create compelling online content, manage their social media presence, and reach a wider audience.
+Kalasakhi (meaning "Art Friend" in Hindi) is an innovative AI assistant designed to empower traditional Indian artisans. By leveraging cutting-edge AI technologies, it helps bridge the gap between age-old craftsmanship and modern digital marketing. Artisans can effortlessly create professional content, optimize their artwork presentations, and expand their reach without needing technical expertise.
 
-Our goal is to help preserve cultural heritage by making it economically viable for artisans to continue their craft.
+### 🌟 Unique Selling Points (USPs)
+- **Cultural Intelligence:** Tailored for Indian traditional arts, with built-in knowledge of regional crafts, heritage stories, and multilingual support (English, Hindi, Punjabi, Haryanvi, Marathi, Telugu, Gujarati, Odia).
+- **All-in-One AI Toolkit:** From photo enhancement to content generation and virtual previews, everything an artisan needs in one intuitive assistant.
+- **Empowerment Focus:** Preserves cultural heritage by making artisanry economically viable through smart, automated digital tools.
+- **User-Friendly Design:** Simple interfaces with guided help, perfect for artisans new to technology.
 
-### ✨ Key Features:
+---
 
-* **AI-Powered Content Creation:** Automatically generate engaging social media posts, product descriptions, and artist stories.
-* **Smart Photography Assistant:** Get AI-driven tips to take professional-quality photos of artwork using just a smartphone.
-* **Marketplace Integration:** Seamlessly post and manage listings on multiple e-commerce and social media platforms.
-* **Cultural Storytelling:** Generate audio and video scripts to share the rich history behind the art forms.
+## ✨ Features
 
-### 🛠️ Built With:
+### 🛠️ Functional Features
 
-* **Frontend:** React, Next.js, Tailwind CSS
-* **Backend:** Node.js, Express
-* **AI:** Google Gemini API, OpenAI GPT-4
-* **Image Processing:** Cloudinary
-* **Database:** MongoDB, PostgreSQL
+#### 🖼️ Art Gallery
+- **Upload Artwork:** Easily upload high-quality photos of your traditional crafts to build your digital portfolio.
+- **Price Management:** Set minimum prices for your pieces to ensure fair compensation.
+- **Visibility Control:** Choose to keep artworks private in your personal gallery or make them public for broader exposure.
+- **Portfolio Management:** Organize and showcase your creations in a clean, professional interface.
+
+#### 🎨 AI Studio
+- **AI-Powered Content Creation:** Upload photos to instantly generate engaging social media posts with captions and hashtags powered by Google Gemini.
+- **Podcast/Webinar Generation:** Record a short voice and face clip to auto-create audio or video podcasts/webinars. Customize duration, include specific questions, set titles, and select from multiple languages (English, Hindi, Punjabi, Haryanvi, Marathi, Telugu, Gujarati, Odia).
+- **Photography Guidance:** Receive practical DIY tips, camera settings, and simple home setup techniques to capture studio-quality photos of your artwork, making products look premium without professional equipment.
+- **Background Processing:** Effortlessly remove backgrounds and generate complementary AI-created ones that enhance the cultural essence of your traditional pieces.
+
+### 🚀 Upcoming Features
+- **Post Editing:** Canva-like intuitive interface for customizing generated posts, text, and visuals to match your personal style.
+- **Smart Pricing Algorithm:** AI-driven price optimization using reinforcement learning to dynamically adjust prices, maximizing sales while always respecting your set minimum margins.
+- **Auto-Pilot Mode:** Hands-free automation – simply upload your art, and the AI will schedule and generate marketing content, podcasts, and social posts over time to boost reach.
+- **Webinar Organization:** Host interactive virtual workshops to teach crafting techniques, sell materials, share personal stories, or showcase products for direct sales.
+- **3D Visualization & AR Preview:** Create immersive 3D models with shareable links allowing customers to preview how your artwork would look in their home via augmented reality.
+- **Multi-Image Thread Generation:** Automatically craft cohesive 5-slide Instagram story threads that narrate the full story of your artwork – from creation techniques to cultural significance.
+- **Performance Analytics:** Comprehensive dashboard to track engagement metrics, follower growth, and sales insights for data-driven improvements.
+
+### 📊 Visual Guides
+- **User Flow Diagram** ![User Flow](https://i.postimg.cc/Zq9381Y6/User-Uploads-media-1.png)
+- **Page Layout Infographic** ![Page Layout](https://i.postimg.cc/KzMDpG1R/Gray-Modern-Financial-Plan-Infographic-Presentation.png)
+
+---
+
+## 🛠️ Built With
+
+<div align="center">
+  <img src="https://img.shields.io/badge/React-%2320232a?style=for-the-badge&logo=react&logoColor=%2361DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/Next.js-%23000000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-%2338B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/Node.js-%2343853D?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Express.js-%23404d59?style=for-the-badge&logo=express&logoColor=%2361DAFB" alt="Express" />
+  <img src="https://img.shields.io/badge/MongoDB-%234ea94b?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" />
+  <img src="https://img.shields.io/badge/PostgreSQL-%23316192?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Google_Gemini-%238E75B2?style=for-the-badge&logo=googlegemini&logoColor=white" alt="Google Gemini" />
+  <img src="https://img.shields.io/badge/Remove.bg-%2300C4B4?style=for-the-badge&logo=remove.bg&logoColor=white" alt="Remove.bg" />
+  <img src="https://img.shields.io/badge/React_Three_Fiber-%2361DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React Three Fiber" />
+</div>
+
+APIs are integrated directly in the code – no need for separate environment variables.
 
 ---
 
 ## 🚀 Getting Started
 
-To get a local copy up and running, please follow these steps.
-
 ### Prerequisites
-
-Make sure you have Node.js and npm installed on your system.
-
-* npm
-    ```sh
-    npm install npm@latest -g
-    ```
+- Node.js and npm installed.
 
 ### Installation
+1. Clone the repo:
+   ```sh
+   git clone [https://github.com/woodocarlo/traditional-arts-platform.git](https://github.com/woodocarlo/traditional-arts-platform.git)
+2. Install dependencies:
+   ```sh
+   npm install
+3. Install dependencies:
+   ```sh
+   npm run dev
+Open http://localhost:3000 in your browser.
 
-1.  **Clone the repo**
-    ```sh
-    git clone [https://github.com/woodocarlo/traditional-arts-platform.git](https://github.com/woodocarlo/traditional-arts-platform.git)
-    ```
-2.  **Install NPM packages**
-    ```sh
-    npm install
-    ```
-3.  **Set up environment variables**
-    Create a `.env` file and add your API keys:
-    ```
-    GEMINI_API_KEY='YOUR_API_KEY'
-    CLOUDINARY_URL='YOUR_CLOUDINARY_URL'
-    ```
+## **📖 How to Use Kalasakhi**
 
----
-
-##  usage
-
-Here's how an artisan might use Kalasakhi:
-
-1.  **Upload a photo** of their latest creation.
-2.  **The AI assistant** suggests lighting and angle improvements.
-3.  **Once the photo is ready,** the AI generates a compelling story and description.
-4.  **With one click,** the artisan can post it to Instagram, Facebook, and their online store.
-
-*(Add a screenshot or GIF of your application here to make it more engaging!)*
+- **Upload Artwork**: In the Art Gallery, add photos, set prices, and choose visibility.
+- **Generate Content**: In AI Studio, upload images for AI suggestions on photoshoots, backgrounds, posts, or podcasts.
+- **Customize & Share**: Use generated content directly or edit (upcoming) before posting to social media.
+- **Explore 3D Previews**: Get shareable links for virtual artwork placements in homes.
 
 ---
 
-## 🤝 Contributing
+## **❓ Help & Instructions**
 
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+Click the "?" icon in the header for guided tours and step-by-step instructions for each section.
 
-Please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+*(Tip: Use high-quality photos and detailed descriptions for optimal AI-generated content.)*
 
+## **🤝 Contributing**
 
+We welcome contributions to make Kalasakhi even better! Fork the repo, make your changes, and submit a pull request. For major features, open an issue first to discuss.
 
-## 💬 Contact
+## **💬 Contact**
 
-Nischal Sharma - [@linkedin](https://www.linkedin.com/in/nischal-sharma-49692025b/) - [@Gmail](mailto:nischalsharma2037@gmail.com)
+Nischal Sharma  
+- [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/nischal-sharma-49692025b/)  
+- [![Gmail](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:nischalsharma2037@gmail.com)  
 
 Project Link: [https://github.com/woodocarlo/traditional-arts-platform](https://github.com/woodocarlo/traditional-arts-platform)
