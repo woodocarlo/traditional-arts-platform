@@ -1,0 +1,27 @@
+{
+  "visual_story_template": [
+    {
+      "slide_type": "TextWithImage",
+      "text_generation_prompt": "Introduction: Briefly introduce the [ART_TYPE] and the artisan's inspiration. User keywords: [USER_CUSTOM_MESSAGE]",
+      "image_generation_prompt": "Generate a background that evokes a sense of inspiration or a workshop setting for a [ART_TYPE]. Aspect ratio: [ASPECT_RATIO]"
+    },
+    {
+      "slide_type": "TextOnly",
+      "text_generation_prompt": "Detail Spotlight: Describe a unique detail of the [ART_TYPE] and its significance. User keywords: [USER_CUSTOM_MESSAGE]"
+    },
+    {
+      "slide_type": "TextWithImage",
+      "text_generation_prompt": "Process: Explain a key step in the creation process of the [ART_TYPE]. User keywords: [USER_CUSTOM_MESSAGE]",
+      "image_generation_prompt": "Generate an abstract, textured background that complements the colors of the [ART_TYPE]. Aspect ratio: [ASPECT_RATIO]"
+    },
+    {
+      "slide_type": "TextOnly",
+      "text_generation_prompt": "Heritage: Connect the [ART_TYPE] to its cultural heritage or the story of the artisan. User keywords: [USER_CUSTOM_MESSAGE]"
+    },
+    {
+      "slide_type": "TextWithImage",
+      "text_generation_prompt": "Call to Action: A final, compelling message inviting viewers to appreciate or purchase the [ART_TYPE]. User keywords: [USER_CUSTOM_MESSAGE]",
+      "image_generation_prompt": "Generate a clean, elegant studio background to showcase the final [ART_TYPE]. Aspect ratio: [ASPECT_RATIO]"
+    }
+  ]
+}

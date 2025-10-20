@@ -9,9 +9,14 @@ const GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY || "AIzaSyDZ5S69yg
 
 // Icons for the UI
 const CloseIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
     <line x1="18" y1="6" x2="6" y2="18"></line>
     <line x1="6" y1="6" x2="18" y2="18"></line>
+  </svg>
+);
+const ExpandIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
   </svg>
 );
 const LoadingSpinner = () => (
@@ -51,58 +56,67 @@ interface GeneratedPost {
 }
 
 export default function CraftPostGenerator() {
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [processedImage, setProcessedImage] = useState<string | null>(null);
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [processedImages, setProcessedImages] = useState<string[]>([]);
   const [aspectRatio, setAspectRatio] = useState<string>("3:4");
   const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const canvasRefs = useRef<(HTMLCanvasElement | null)[]>([]);
+  const [expandedImage, setExpandedImage] = useState<string | null>(null);
+  const [isAIDisabled, setIsAIDisabled] = useState<boolean>(false);
 
-  const steps = [
-    'Generating design variations...',
-    'Crafting compelling captions...',
-    'Assembling visual elements...',
-    'Finalizing your posts...',
+  const uploadSteps = [
+    'Uploading image...', 
+  ];
+
+  const generationSteps = [
+    'Generating design variations...', 
+    'Crafting compelling captions...', 
+    'Assembling visual elements...', 
+    'Finalizing your posts...', 
   ];
 
   // Handle image upload
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setUploadedImage(url);
+    const files = event.target.files;
+    if (files) {
+      const urls = Array.from(files).map(file => URL.createObjectURL(file));
+      setUploadedImages(prev => [...prev, ...urls]);
       
-      const img = new Image();
-      img.onload = () => {
-        setImageDimensions({ width: img.width, height: img.height });
-      };
-      img.src = url;
-      
-      setLoading(true);
+      setIsUploading(true);
       try {
-        const formData = new FormData();
-        formData.append("image_file", file);
-        formData.append("size", "auto");
+        const processed: string[] = [];
+        for (const file of Array.from(files)) {
+          const formData = new FormData();
+          formData.append("image_file", file);
+          formData.append("size", "auto");
 
-        const response = await axios.post("https://api.remove.bg/v1.0/removebg", formData, {
-          headers: {
-            "X-Api-Key": REMOVE_BG_API_KEY,
-            "Content-Type": "multipart/form-data",
-          },
-          responseType: "blob",
-        });
+          const response = await axios.post("https://api.remove.bg/v1.0/removebg", formData, {
+            headers: {
+              "X-Api-Key": REMOVE_BG_API_KEY,
+              "Content-Type": "multipart/form-data",
+            },
+            responseType: "blob",
+          });
 
-        const processedUrl = URL.createObjectURL(response.data);
-        setProcessedImage(processedUrl);
+          processed.push(URL.createObjectURL(response.data));
+        }
+        setProcessedImages(prev => [...prev, ...processed]);
       } catch (error) {
         console.error("Error removing background:", error);
         alert("Failed to remove background. Check API key or try again.");
       } finally {
-        setLoading(false);
+        setIsUploading(false);
       }
     }
+  };
+
+  const removeImage = (index: number) => {
+    setUploadedImages(prev => prev.filter((_, i) => i !== index));
+    setProcessedImages(prev => prev.filter((_, i) => i !== index));
   };
 
   // Generate caption and hashtags using Gemini API
@@ -116,7 +130,7 @@ export default function CraftPostGenerator() {
               text: `Generate a catchy social media caption and 5 relevant hashtags for a traditional craft product post. 
               Include the punchline: "${punchline}". 
               Format your response with the caption first, followed by two line breaks, then the hashtags separated by spaces.` 
-            }] 
+            }]
           }],
         },
         {
@@ -175,7 +189,7 @@ export default function CraftPostGenerator() {
               text: `Generate a very short heading (2-3 words), a very short subheading (2-3 words), and a punchline (3-5 words) for a traditional craft product social media post. 
               Use the following punchline as inspiration: "${punchline}".
               Format your response as: heading|subheading|punchline` 
-            }] 
+            }]
           }],
         },
         {
@@ -267,10 +281,10 @@ export default function CraftPostGenerator() {
 
   const drawPostToCanvas = (post: GeneratedPost, index: number) => {
     const canvas = canvasRefs.current[index];
-    if (!canvas) return;
+    if (!canvas) return; 
     
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) return; 
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
@@ -278,6 +292,9 @@ export default function CraftPostGenerator() {
     if (aspectRatio === "3:4") {
       canvasWidth = 300;
       canvasHeight = 400;
+    } else if (aspectRatio === "1:1") {
+      canvasWidth = 350;
+      canvasHeight = 350;
     } else {
       canvasWidth = 270;
       canvasHeight = 480;
@@ -361,7 +378,7 @@ export default function CraftPostGenerator() {
   };
 
   const drawProcessedImage = (ctx: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number, index: number) => {
-    if (!processedImage) return;
+    if (processedImages.length === 0) return; 
     
     const img = new Image();
     img.onload = () => {
@@ -371,7 +388,7 @@ export default function CraftPostGenerator() {
       
       ctx.drawImage(img, x, y, size.width, size.height);
     };
-    img.src = processedImage;
+    img.src = processedImages[0];
   };
 
   const drawTextElements = (ctx: CanvasRenderingContext2D, post: GeneratedPost, canvasWidth: number, canvasHeight: number) => {
@@ -392,20 +409,19 @@ export default function CraftPostGenerator() {
   };
 
   const generatePosts = async () => {
-    if (!processedImage) {
+    if (processedImages.length === 0) {
       alert("Please upload and process an image first.");
       return;
     }
     
     setGeneratedPosts([]);
-    setLoading(true);
+    setIsGenerating(true);
     setCurrentStep(0);
     
-    // Generate exactly 3 posts
     const numPosts = 3;
-  const posts: GeneratedPost[] = [];
+    const posts: GeneratedPost[] = [];
     
-    for (let i = 0; i < steps.length; i++) {
+    for (let i = 0; i < generationSteps.length; i++) {
       setCurrentStep(i);
       await new Promise(resolve => setTimeout(resolve, 1200));
     }
@@ -444,14 +460,14 @@ export default function CraftPostGenerator() {
     }
 
     setGeneratedPosts(posts);
-    setLoading(false);
+    setIsGenerating(false);
   };
 
   const regenerateImage = async (index: number) => {
-    setLoading(true);
+    setIsGenerating(true);
     setCurrentStep(0);
 
-    for (let i = 0; i < steps.length; i++) {
+    for (let i = 0; i < generationSteps.length; i++) {
       setCurrentStep(i);
       await new Promise(resolve => setTimeout(resolve, 1200));
     }
@@ -489,12 +505,12 @@ export default function CraftPostGenerator() {
     };
     
     setGeneratedPosts(updatedPosts);
-    setLoading(false);
+    setIsGenerating(false);
   };
 
   const handleShare = async (index: number) => {
     const canvas = canvasRefs.current[index];
-    if (!canvas) return;
+    if (!canvas) return; 
 
     try {
       const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
@@ -526,7 +542,7 @@ export default function CraftPostGenerator() {
     generatedPosts.forEach((post, index) => {
       setTimeout(() => drawPostToCanvas(post, index), 100);
     });
-  }, [generatedPosts]);
+  }, [generatedPosts, processedImages]);
 
   const onClose = () => {
     if (typeof window !== "undefined") {
@@ -562,12 +578,21 @@ export default function CraftPostGenerator() {
           Upload an image of your craft and let our AI generate beautiful social media posts for you in seconds.
         </p>
         
-        {loading && (
+        {isUploading && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
+            <div className="bg-white/10 p-8 rounded-2xl border border-white/20 text-center flex flex-col items-center">
+              <LoadingSpinner />
+              <h3 className="text-xl font-semibold text-white mt-4">Uploading image...</h3>
+            </div>
+          </div>
+        )}
+
+        {isGenerating && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
             <div className="bg-white/10 p-8 rounded-2xl border border-white/20 text-center">
               <h3 className="text-xl font-semibold text-white mb-4">Crafting Your Posts</h3>
               <div className="space-y-4">
-                {steps.map((step, index) => (
+                {generationSteps.map((step, index) => (
                   <div key={index} className="flex items-center gap-3">
                     {index < currentStep ? (
                       <span className="text-green-400">✓</span>
@@ -583,7 +608,7 @@ export default function CraftPostGenerator() {
               <div className="mt-6 w-64 bg-gray-700 rounded-full h-2">
                 <div 
                   className="bg-gradient-to-r from-purple-600 to-pink-600 h-2 rounded-full animate-pulse"
-                  style={{width: `${(currentStep / steps.length) * 100}%`}}
+                  style={{width: `${(currentStep / generationSteps.length) * 100}%`}}
                 ></div>
               </div>
             </div>
@@ -591,44 +616,130 @@ export default function CraftPostGenerator() {
         )}
         
         <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/20 space-y-8">
-          {/* Upload Section */}
-          <div>
-            <h4 className="text-2xl font-semibold text-white mb-4">1. Upload Your Craft Image</h4>
-            <div className="space-y-2">
-              <label className="text-white font-medium">Choose an image of your product:</label>
-              <input type="file" accept="image/*" onChange={handleUpload} className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700"/>
-              {uploadedImage && <img src={uploadedImage} alt="Uploaded" className="mt-4 w-32 h-auto rounded-lg border border-white/20" />}
+          <div className="grid grid-cols-2 gap-8">
+            <div>
+              <h4 className="text-2xl font-semibold text-white mb-4">1. Upload Your Craft Images</h4>
+              <div className="space-y-2">
+                <label className="text-white font-medium">Choose images of your product:</label>
+                <input type="file" accept="image/*" multiple onChange={handleUpload} className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700"/>
+                <div className="relative">
+                  <div className="flex overflow-x-auto space-x-4 py-4 scrollbar-hide" style={{ maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
+                    {uploadedImages.map((image, index) => (
+                      <div key={index} className="relative group flex-shrink-0">
+                        <img src={image} alt={`Uploaded ${index}`} className="w-36 h-36 object-cover rounded-lg border-2 border-white/20 group-hover:border-purple-400 transition-all" />
+                        <div className="absolute top-1 right-1 flex flex-col space-y-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onClick={() => removeImage(index)} className="p-1 bg-black/50 rounded-full text-white hover:bg-black/70">
+                            <CloseIcon />
+                          </button>
+                          <button onClick={() => setExpandedImage(image)} className="p-1 bg-black/50 rounded-full text-white hover:bg-black/70">
+                            <ExpandIcon />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h4 className="text-2xl font-semibold text-white mb-4">2. Customize Your Post</h4>
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-white font-medium mb-2">Craft Your Message</label>
+                  <div className="flex items-start gap-3">
+                    <textarea
+                      placeholder={isAIDisabled ? "You have selected auto AI description generation." : "add a background story or describe the art."}
+                    <div className="flex flex-col gap-2">
+                      <button className="p-3 bg-purple-600 hover:bg-purple-700 rounded-full text-white transition-colors shadow-lg">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                          <line x1="12" y1="19" x2="12" y2="23"></line>
+                          <line x1="8" y1="23" x2="16" y2="23"></line>
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => setIsAIDisabled(!isAIDisabled)}
+                        className={`p-3 rounded-full text-white transition-colors shadow-lg ${isAIDisabled ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-600 hover:bg-gray-700'}`}
+                      >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <h5 className="text-lg text-white mb-4">Set Your Stage</h5>
+                  <div className="grid grid-cols-3 gap-3">
+                    <button className="p-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg text-left transition-all transform hover:scale-105 shadow-lg">
+                      <div className="font-bold text-base mb-1">Shop Drop</div>
+                      <div className="text-xs opacity-90">Create an elegant post to showcase the fine details of your art.</div>
+                    </button>
+                    <button className="p-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg text-left transition-all transform hover:scale-105 shadow-lg">
+                      <div className="font-bold text-base mb-1">Unfold the Tale</div>
+                      <div className="text-xs opacity-90">Share the story behind your work—from inspiration to creation.</div>
+                    </button>
+                    <button className="p-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg text-left transition-all transform hover:scale-105 shadow-lg">
+                      <div className="font-bold text-base mb-1">Art Spotlight</div>
+                      <div className="text-xs opacity-90">Generate a sales-focused post with a clear call-to-action.</div>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Aspect Ratio Selector */}
           <div>
-            <h4 className="text-2xl font-semibold text-white mb-4">2. Select Your Post Format</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <h4 className="text-2xl font-semibold text-white mb-4">3. Select Your Post Format</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <button
                 onClick={() => setAspectRatio("3:4")}
-                className={`p-4 rounded-lg border-2 transition-all text-left ${
-                  aspectRatio === '3:4'
+                className={`p-4 rounded-lg border-2 transition-all text-left ${ aspectRatio === '3:4'
                     ? 'border-purple-400 bg-purple-900/30'
                     : 'border-white/20 bg-black/30 hover:border-white/30'
                 }`}
               >
                 <div className="h-64 bg-gray-700 rounded-lg flex items-center justify-center relative overflow-hidden">
-                  <div className="w-[150px] h-[200px] bg-white/10 border-white/40 border-2 rounded"></div>
+                  <div className="w-[150px] h-[200px] bg-white/10 border-white/40 border-2 rounded relative">
+                    <svg className="absolute w-full h-full" viewBox="0 0 150 200" preserveAspectRatio="none">
+                      <line x1="0" y1="0" x2="150" y2="200" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-dasharray="4 4" />
+                    </svg>
+                  </div>
                   <p className="absolute text-white font-semibold bottom-4">Portrait (3:4)</p>
                 </div>
               </button>
               <button
                 onClick={() => setAspectRatio("9:16")}
-                className={`p-4 rounded-lg border-2 transition-all text-left ${
-                  aspectRatio === '9:16'
+                className={`p-4 rounded-lg border-2 transition-all text-left ${ aspectRatio === '9:16'
                     ? 'border-purple-400 bg-purple-900/30'
                     : 'border-white/20 bg-black/30 hover:border-white/30'
                 }`}
               >
                 <div className="h-64 bg-gray-700 rounded-lg flex items-center justify-center relative overflow-hidden">
-                  <div className="w-[100px] h-[200px] bg-white/10 border-white/40 border-2 rounded"></div>
+                  <div className="w-[100px] h-[200px] bg-white/10 border-white/40 border-2 rounded relative">
+                    <svg className="absolute w-full h-full" viewBox="0 0 100 200" preserveAspectRatio="none">
+                      <line x1="0" y1="0" x2="100" y2="200" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-dasharray="4 4" />
+                    </svg>
+                  </div>
                   <p className="absolute text-white font-semibold bottom-4">Story (9:16)</p>
+                </div>
+              </button>
+              <button
+                onClick={() => setAspectRatio("1:1")}
+                className={`p-4 rounded-lg border-2 transition-all text-left ${ aspectRatio === '1:1'
+                    ? 'border-purple-400 bg-purple-900/30'
+                    : 'border-white/20 bg-black/30 hover:border-white/30'
+                }`}
+              >
+                <div className="h-64 bg-gray-700 rounded-lg flex items-center justify-center relative overflow-hidden">
+                  <div className="w-[150px] h-[150px] bg-white/10 border-white/40 border-2 rounded relative">
+                    <svg className="absolute w-full h-full" viewBox="0 0 150 150" preserveAspectRatio="none">
+                      <line x1="0" y1="0" x2="150" y2="150" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-dasharray="4 4" />
+                    </svg>
+                  </div>
+                  <p className="absolute text-white font-semibold bottom-4">Post (1:1)</p>
                 </div>
               </button>
             </div>
@@ -638,7 +749,7 @@ export default function CraftPostGenerator() {
           <div className="flex justify-center">
             <button
               onClick={generatePosts}
-              disabled={loading || !processedImage}
+              disabled={isUploading || isGenerating || processedImages.length === 0}
               className="px-12 py-4 bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 hover:from-purple-700 hover:via-purple-800 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white font-semibold transition-all transform hover:scale-105 shadow-lg"
             >
               Generate Posts
@@ -701,6 +812,18 @@ export default function CraftPostGenerator() {
         </div>
       </div>
 
+      {expandedImage && (
+        <div 
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center"
+          onClick={() => setExpandedImage(null)}
+        >
+          <img src={expandedImage} alt="Expanded view" className="max-w-[90vw] max-h-[90vh] object-contain" />
+          <button onClick={() => setExpandedImage(null)} className="absolute top-4 right-4 p-2 bg-black/50 rounded-full text-white hover:bg-black/70">
+            <CloseIcon />
+          </button>
+        </div>
+      )}
+
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@500;700&family=Pacifico&family=Dancing+Script:wght@700&family=Roboto:wght@500;700&family=Oswald:wght@500&family=Lobster&family=Merriweather:wght@700&display=swap');
         
@@ -712,6 +835,8 @@ export default function CraftPostGenerator() {
         .font-oswald { font-family: 'Oswald', sans-serif; }
         .font-lobster { font-family: 'Lobster', cursive; }
         .font-merriweather { font-family: 'Merriweather', serif; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
     </div>
   );
