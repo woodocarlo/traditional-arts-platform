@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 
 const CloseIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -15,8 +16,7 @@ const FaceUploadModal = ({ onClose }: { onClose: () => void }) => {
   const [recordedChunks, setRecordedChunks] = useState<Blob[]>([]);
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>('');
-  const [isPreviewMode, setIsPreviewMode] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
   const [recordingTime, setRecordingTime] = useState(0);
   const [maxTimeReached, setMaxTimeReached] = useState(false);
   const recordingTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -195,11 +195,11 @@ const FaceUploadModal = ({ onClose }: { onClose: () => void }) => {
             <h4 className="text-white font-medium mb-4 text-center">Examples</h4>
             <div className="space-y-4">
               <div className="bg-gray-800/50 rounded-lg p-3 border border-white/10">
-                <img src="https://i.postimg.cc/44rr24LZ/Gemini-Generated-Image-az9mhdaz9mhdaz9m.png" alt="Good Example 1" className="w-full h-32 rounded object-cover mb-2" />
+                <Image src="https://i.postimg.cc/44rr24LZ/Gemini-Generated-Image-az9mhdaz9mhdaz9m.png" alt="Good Example 1" width={256} height={128} className="w-full h-32 rounded object-cover mb-2" />
                 <p className="text-gray-300 text-xs text-center">Face centered and well lit</p>
               </div>
               <div className="bg-gray-800/50 rounded-lg p-3 border border-white/10">
-                <img src="https://i.postimg.cc/Kv6sf9Yj/Gemini-Generated-Image-96gjve96gjve96gj.png" alt="Good Example 2" className="w-full h-32 rounded object-cover mb-2" />
+                <Image src="https://i.postimg.cc/Kv6sf9Yj/Gemini-Generated-Image-96gjve96gjve96gj.png" alt="Good Example 2" width={256} height={128} className="w-full h-32 rounded object-cover mb-2" />
                 <p className="text-gray-300 text-xs text-center">Slight Head Movement</p>
               </div>
             </div>

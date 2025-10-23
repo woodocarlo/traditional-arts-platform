@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import { generateBackground, generateCenter, generateOverlay, GenerateImageParams } from "./apiService";
+import { generateBackground, generateCenter, generateOverlay } from "./apiService";
 
 // Placeholder for API keys (use environment variables in production)
 const REMOVE_BG_API_KEY = process.env.NEXT_PUBLIC_REMOVE_BG_API_KEY || " rnYsL35fBiWXmzFF4XxdRULo";

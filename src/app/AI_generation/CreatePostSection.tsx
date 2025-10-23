@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import FaceUploadModal from './FaceUploadModal';
 
 // --- Type Definitions ---
@@ -99,8 +99,6 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
   const [isEditingScript, setIsEditingScript] = useState<boolean>(false);
   const [isFaceModalOpen, setIsFaceModalOpen] = useState<boolean>(false);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
-  const [cameraDevices, setCameraDevices] = useState<MediaDeviceInfo[]>([]);
-  const [selectedCameraDeviceId, setSelectedCameraDeviceId] = useState<string>('');
 
   const stopCameraStream = () => {
     if (cameraStream) {

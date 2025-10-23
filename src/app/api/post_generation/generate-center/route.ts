@@ -4,6 +4,26 @@ import axios from 'axios';
 import * as fs from 'fs';
 import * as path from 'path';
 
+interface VertexAIRequestBody {
+  instances: Array<{
+    prompt: string;
+    referenceImages?: Array<{
+      referenceImage: {
+        bytesBase64Encoded: string;
+      };
+      referenceId: number;
+      referenceType: string;
+    }>;
+  }>;
+  parameters: {
+    sampleCount: number;
+    aspectRatio: string;
+    safetyFilterLevel: string;
+    personGeneration: string;
+    referenceStrength?: number;
+  };
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { postType, description, aspectRatio, image } = await request.json();
@@ -38,7 +58,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Prepare the request body for Vertex AI Imagen
-    const requestBody: any = {
+    const requestBody: VertexAIRequestBody = {
       instances: [
         {
           prompt: prompt,
