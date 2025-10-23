@@ -99,13 +99,12 @@ const BackIcon = () => (
 
 // Sample gallery items
 const galleryItems: GalleryItem[] = [
-    { id: 1, src: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?q=80&w=800&auto=format&fit=crop', alt: 'Madhubani Painting', type: 'image', posts: 12, purchases: 5, date: '2023-10-15' },
-    { id: 2, src: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=800&auto=format&fit=crop', alt: 'Warli Art', type: 'image', posts: 8, purchases: 3, date: '2023-09-22' },
-    { id: 3, src: 'https://images.unsplash.com/photo-1578321272176-b7bbc0679853?q=80&w=800&auto=format&fit=crop', alt: 'Pattachitra', type: 'image', posts: 15, purchases: 7, date: '2023-11-05' },
-    { id: 4, src: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=800&auto=format&fit=crop', alt: 'Tanjore Painting', type: 'image', posts: 6, purchases: 2, date: '2023-08-30' },
-    { id: 5, src: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?q=80&w=800&auto=format&fit=crop', alt: 'Blue Pottery', type: 'image', posts: 9, purchases: 4, date: '2023-10-28' },
-    { id: 6, src: 'https://images.unsplash.com/photo-1578321272176-b7bbc0679853?q=80&w=800&auto=format&fit=crop', alt: 'Kalamkari', type: 'image', posts: 11, purchases: 6, date: '2023-09-15' },
-    // Add some sample video and audio items for testing
+    { id: 1, src: 'https://i.postimg.cc/CLjf6gpY/image.png', alt: 'Madhubani Painting', type: 'image', posts: 12, purchases: 5, date: '2023-10-15' },
+    { id: 2, src: 'https://i.postimg.cc/Bn6wBNRc/image.png', alt: 'Warli Art', type: 'image', posts: 8, purchases: 3, date: '2023-09-22' },
+    { id: 3, src: 'https://i.postimg.cc/Tw7KgdbV/image.png', alt: 'Pattachitra', type: 'image', posts: 15, purchases: 7, date: '2023-11-05' },
+    { id: 4, src: 'https://i.postimg.cc/2yS4N9QJ/image.png', alt: 'Tanjore Painting', type: 'image', posts: 6, purchases: 2, date: '2023-08-30' },
+    { id: 5, src: 'https://i.postimg.cc/Lsk4BHcV/719Lgc-Xp4-L-SY879.jpg', alt: 'Blue Pottery', type: 'image', posts: 9, purchases: 4, date: '2025-09-28' },
+    { id: 6, src: 'https://i.postimg.cc/zvZ9dWTr/image.png', alt: 'Home Decor', type: 'image', posts: 11, purchases: 6, date: '2023-09-15' },
     { id: 7, src: 'https://www.w3schools.com/html/mov_bbb.mp4', alt: 'Traditional Dance', type: 'video', posts: 5, purchases: 2, date: '2023-09-10' },
     { id: 8, src: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav', alt: 'Temple Bells', type: 'audio', posts: 3, purchases: 1, date: '2023-08-25' },
 ];
