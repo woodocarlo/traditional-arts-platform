@@ -226,7 +226,7 @@ export default function KalaSakhiLandingPage() {
         "Capture stunning photos of your crafts with AI-powered guidance. Get real-time suggestions for lighting, angles, composition, and staging to make your art pieces look museum-worthy, using either a smartphone or professional camera",
       buttonText: "Get Photo Tips",
       image:
-        "https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+        "https://i.postimg.cc/hG7XR1W4/photography-lighting.jpg",
       Icon: CameraIcon,
     },
     {

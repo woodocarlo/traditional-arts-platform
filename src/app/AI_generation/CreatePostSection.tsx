@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import FaceUploadModal from './FaceUploadModal';
 
 // --- Type Definitions ---
 interface CardData {
@@ -96,6 +97,31 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
   const [generatedPodcast, setGeneratedPodcast] = useState<GeneratedPodcast | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isEditingScript, setIsEditingScript] = useState<boolean>(false);
+  const [isFaceModalOpen, setIsFaceModalOpen] = useState<boolean>(false);
+  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+  const [cameraDevices, setCameraDevices] = useState<MediaDeviceInfo[]>([]);
+  const [selectedCameraDeviceId, setSelectedCameraDeviceId] = useState<string>('');
+
+  const stopCameraStream = () => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      setCameraStream(null);
+    }
+  };
+
+  const forceStopCamera = async () => {
+    try {
+      // Try to switch to a non-existent device to force camera off
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { deviceId: { exact: 'none' } }
+      });
+      stream.getTracks().forEach(track => track.stop());
+    } catch (err) {
+      // Expected to fail, but this helps ensure camera is off
+      console.log('Camera force stop attempted');
+    }
+    stopCameraStream();
+  };
 
   useEffect(() => {
     loadUploadedStories();
@@ -387,6 +413,17 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
               ))}
             </div>
           </div>
+          {podcastConfig.type === 'face' && (
+            <div className="space-y-2">
+              <label className="text-white font-medium">Face Video</label>
+              <button
+                onClick={() => setIsFaceModalOpen(true)}
+                className="w-full p-3 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-medium transition-colors"
+              >
+                Upload Face Video
+              </button>
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-white font-medium">Host Name</label>
@@ -537,6 +574,10 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
           </div>
         </div>
       )}
+      {isFaceModalOpen && <FaceUploadModal onClose={() => {
+        setIsFaceModalOpen(false);
+        forceStopCamera();
+      }} />}
     </div>
   );
 
@@ -688,7 +729,10 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
             <h2 className="text-3xl font-bold text-white">{cardData.title}</h2>
           </div>
           <button
-            onClick={onClose}
+            onClick={() => {
+              forceStopCamera();
+              onClose();
+            }}
             className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
           >
             <CloseIcon />
@@ -718,6 +762,7 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
         <div className="flex justify-center gap-4 mt-8">
           <button
             onClick={() => {
+              forceStopCamera();
               if (onClose) onClose();
               loadExistingPodcasts();
             }}
@@ -730,3 +775,5 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
     </div>
   );
 }
+
+

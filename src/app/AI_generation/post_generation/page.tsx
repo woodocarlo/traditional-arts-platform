@@ -1,11 +1,16 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import assets from "./stock.json";
+import { generateBackground, generateCenter, generateOverlay, GenerateImageParams } from "./apiService";
 
 // Placeholder for API keys (use environment variables in production)
 const REMOVE_BG_API_KEY = process.env.NEXT_PUBLIC_REMOVE_BG_API_KEY || " rnYsL35fBiWXmzFF4XxdRULo";
 const GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY || "AIzaSyDZ5S69ygJDM1eJFxvV6AqCEUtl9Uqryiw"
+
+// Narrow navigator.share typing for feature detection without using `any`
+type ShareNavigator = Navigator & {
+  share?: (data: { files?: File[]; title?: string; text?: string }) => Promise<void>;
+};
 
 // Icons for the UI
 const CloseIcon = () => (
@@ -13,6 +18,7 @@ const CloseIcon = () => (
     <line x1="18" y1="6" x2="6" y2="18"></line>
     <line x1="6" y1="6" x2="18" y2="18"></line>
   </svg>
+  
 );
 const ExpandIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -67,6 +73,8 @@ export default function CraftPostGenerator() {
   const canvasRefs = useRef<(HTMLCanvasElement | null)[]>([]);
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const [isAIDisabled, setIsAIDisabled] = useState<boolean>(false);
+  const [description, setDescription] = useState<string>("");
+  const [postType, setPostType] = useState<string>("Shop Drop");
 
   const uploadSteps = [
     'Uploading image...', 
@@ -119,17 +127,63 @@ export default function CraftPostGenerator() {
     setProcessedImages(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Generate caption and hashtags using Gemini API
-  const generateCaptionAndHashtags = async (punchline: string) => {
+  // Generate description if needed
+  const generateDescription = async (postType: string) => {
     try {
       const response = await axios.post(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+        "https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent",
         {
-          contents: [{ 
-            parts: [{ 
-              text: `Generate a catchy social media caption and 5 relevant hashtags for a traditional craft product post. 
-              Include the punchline: "${punchline}". 
-              Format your response with the caption first, followed by two line breaks, then the hashtags separated by spaces.` 
+          contents: [{
+            parts: [{
+              text: `Generate a short, engaging description (2-3 sentences) for a ${postType} social media post about a traditional craft product. Make it suitable for the post type.`
+            }]
+          }],
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+          params: { key: GEMINI_API_KEY },
+        }
+      );
+
+      let generatedText = "";
+
+      if (response.data.candidates && response.data.candidates[0] &&
+          response.data.candidates[0].content && response.data.candidates[0].content.parts &&
+          response.data.candidates[0].content.parts[0] && response.data.candidates[0].content.parts[0].text) {
+        generatedText = response.data.candidates[0].content.parts[0].text;
+      } else {
+        throw new Error("Unexpected API response structure");
+      }
+
+      return generatedText.trim();
+    } catch (error) {
+      console.error("Error generating description:", error);
+      return "Beautiful handcrafted item showcasing traditional craftsmanship.";
+    }
+  };
+
+  // Generate caption and hashtags using Gemini API
+  const generateCaptionAndHashtags = async (punchline: string, description: string, postType: string) => {
+    let postTypeInstruction = "";
+    if (postType === "Shop Drop") {
+      postTypeInstruction = "Create an elegant post to showcase the fine details of the art.";
+    } else if (postType === "Unfold the Tale") {
+      postTypeInstruction = "Share the story behind the work—from inspiration to creation.";
+    } else if (postType === "Art Spotlight") {
+      postTypeInstruction = "Generate a sales-focused post with a clear call-to-action.";
+    }
+
+    try {
+      const response = await axios.post(
+        "https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent",
+        {
+          contents: [{
+            parts: [{
+              text: `Generate a catchy social media caption and 5 relevant hashtags for a traditional craft product post.
+              ${postTypeInstruction}
+              Based on this description: "${description}"
+              Include the punchline: "${punchline}".
+              Format your response with the caption first, followed by two line breaks, then the hashtags separated by spaces.`
             }]
           }],
         },
@@ -182,13 +236,13 @@ export default function CraftPostGenerator() {
   const generatePostText = async (punchline: string) => {
     try {
       const response = await axios.post(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+        "https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent",
         {
-          contents: [{ 
-            parts: [{ 
-              text: `Generate a very short heading (2-3 words), a very short subheading (2-3 words), and a punchline (3-5 words) for a traditional craft product social media post. 
+          contents: [{
+            parts: [{
+              text: `Generate a very short heading (2-3 words), a very short subheading (2-3 words), and a punchline (3-5 words) for a traditional craft product social media post.
               Use the following punchline as inspiration: "${punchline}".
-              Format your response as: heading|subheading|punchline` 
+              Format your response as: heading|subheading|punchline`
             }]
           }],
         },
@@ -413,42 +467,65 @@ export default function CraftPostGenerator() {
       alert("Please upload and process an image first.");
       return;
     }
-    
+
     setGeneratedPosts([]);
     setIsGenerating(true);
     setCurrentStep(0);
-    
+
     const numPosts = 3;
     const posts: GeneratedPost[] = [];
-    
+
     for (let i = 0; i < generationSteps.length; i++) {
       setCurrentStep(i);
       await new Promise(resolve => setTimeout(resolve, 1200));
     }
-    
+
+    let finalDescription = description;
+    if (isAIDisabled) {
+      finalDescription = await generateDescription(postType);
+    }
+
     for (let i = 0; i < numPosts; i++) {
-      const bg = assets.backgrounds[Math.floor(Math.random() * assets.backgrounds.length)];
-      const center = Math.random() > 0.3 ? 
-        assets.centerImages[Math.floor(Math.random() * assets.centerImages.length)] : 
-        { url: "none", name: "None" };
-      const overlay = Math.random() > 0.4 ? 
-        assets.overlays[Math.floor(Math.random() * assets.overlays.length)] : 
-        { url: "none", name: "None" };
-      const punchlineObj = assets.punchlines[Math.floor(Math.random() * assets.punchlines.length)];
-      
+      // Generate background using Vertex AI
+      const bgUrl = await generateBackground({
+        postType,
+        description: finalDescription,
+        aspectRatio,
+        image: processedImages[0],
+      });
+
+      // Generate center image using Vertex AI
+      const centerUrl = Math.random() > 0.3 ? await generateCenter({
+        postType,
+        description: finalDescription,
+        aspectRatio,
+        image: processedImages[0],
+      }) : "none";
+
+      // Generate overlay using Vertex AI
+      const overlayUrl = Math.random() > 0.4 ? await generateOverlay({
+        postType,
+        description: finalDescription,
+        aspectRatio,
+        image: processedImages[0],
+      }) : "none";
+
+      // Use punchlines from stock.json or generate new ones
+      const punchlineObj = { text: "Crafted with passion, just for you." }; // Placeholder, can be generated via AI
+
       const fontKeys = Object.keys(fontLibrary);
       const randomFont = fontKeys[Math.floor(Math.random() * fontKeys.length)];
-      
+
       const opacity = Math.floor(Math.random() * 8) + 20;
 
-      const { caption, hashtags } = await generateCaptionAndHashtags(punchlineObj.text);
+      const { caption, hashtags } = await generateCaptionAndHashtags(punchlineObj.text, finalDescription, postType);
       const { heading, subheading, punchline } = await generatePostText(punchlineObj.text);
 
       posts.push({
-        bgUrl: bg.url,
-        bgColor: (bg as { color?: string }).color || "dark",
-        centerUrl: center.url,
-        overlayUrl: overlay.url,
+        bgUrl,
+        bgColor: "dark", // Default, can be adjusted
+        centerUrl,
+        overlayUrl,
         heading,
         subheading,
         punchline,
@@ -471,56 +548,73 @@ export default function CraftPostGenerator() {
       setCurrentStep(i);
       await new Promise(resolve => setTimeout(resolve, 1200));
     }
-    
+
     const updatedPosts = [...generatedPosts];
-    
-    const bg = assets.backgrounds[Math.floor(Math.random() * assets.backgrounds.length)];
-    const center = Math.random() > 0.3 ? 
-      assets.centerImages[Math.floor(Math.random() * assets.centerImages.length)] : 
-      { url: "none", name: "None" };
-    const overlay = Math.random() > 0.4 ? 
-      assets.overlays[Math.floor(Math.random() * assets.overlays.length)] : 
-      { url: "none", name: "None" };
-    
+
+    let finalDescription = description;
+    if (isAIDisabled) {
+      finalDescription = await generateDescription(postType);
+    }
+
+    // Generate background using Vertex AI
+    const bgUrl = await generateBackground({
+      postType,
+      description: finalDescription,
+      aspectRatio,
+      image: processedImages[0],
+    });
+
+    // Generate center image using Vertex AI
+    const centerUrl = Math.random() > 0.3 ? await generateCenter({
+      postType,
+      description: finalDescription,
+      aspectRatio,
+      image: processedImages[0],
+    }) : "none";
+
+    // Generate overlay using Vertex AI
+    const overlayUrl = Math.random() > 0.4 ? await generateOverlay({
+      postType,
+      description: finalDescription,
+      aspectRatio,
+      image: processedImages[0],
+    }) : "none";
+
     const fontKeys = Object.keys(fontLibrary);
     const randomFont = fontKeys[Math.floor(Math.random() * fontKeys.length)];
-    
+
     const opacity = Math.floor(Math.random() * 8) + 20;
-    
+
     // Generate new text elements for the regenerated post
-    const punchlineObj = assets.punchlines[Math.floor(Math.random() * assets.punchlines.length)];
+    const punchlineObj = { text: "Crafted with passion, just for you." }; // Placeholder
     const { heading, subheading, punchline } = await generatePostText(punchlineObj.text);
-    
+
     updatedPosts[index] = {
       ...updatedPosts[index],
-      bgUrl: bg.url,
-      bgColor: (bg as { color?: string }).color || "dark",
-      centerUrl: center.url,
-      overlayUrl: overlay.url,
+      bgUrl,
+      bgColor: "dark",
+      centerUrl,
+      overlayUrl,
       fontFamily: randomFont,
       opacity: opacity / 100,
       heading,
       subheading,
       punchline,
     };
-    
+
     setGeneratedPosts(updatedPosts);
     setIsGenerating(false);
   };
 
   const handleShare = async (index: number) => {
     const canvas = canvasRefs.current[index];
-    if (!canvas) return; 
+    if (!canvas) return;
 
     try {
       const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
       if (!blob) throw new Error("Failed to create blob from canvas.");
 
       const file = new File([blob], 'post.png', { type: 'image/png' });
-
-      type ShareNavigator = Navigator & {
-        share?: (data: { files?: File[]; title?: string; text?: string }) => Promise<void>;
-      };
 
       const nav = typeof navigator !== 'undefined' ? (navigator as ShareNavigator) : undefined;
       if (nav && typeof nav.share === 'function') {
@@ -551,7 +645,7 @@ export default function CraftPostGenerator() {
   };
 
   return (
-    <div className="relative min-h-screen p-8 bg-gradient-to-br from-[#1d002a] via-[#2d1b69] to-[#4b006e] text-white font-['Inter',_sans-serif] overflow-hidden">
+    <div className="relative min-h-screen p-8 bg-gradient-to-b from-[#1d002a] via-[#2d1b69] to-[#4b006e] text-white font-['Inter',_sans-serif] overflow-hidden">
       {/* Mandela Pattern Overlay */}
       <div
         className="absolute inset-0 opacity-25 pointer-events-none"
@@ -626,7 +720,7 @@ export default function CraftPostGenerator() {
                   <div className="flex overflow-x-auto space-x-4 py-4 scrollbar-hide" style={{ maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
                     {uploadedImages.map((image, index) => (
                       <div key={index} className="relative group flex-shrink-0">
-                        <img src={image} alt={`Uploaded ${index}`} className="w-36 h-36 object-cover rounded-lg border-2 border-white/20 group-hover:border-purple-400 transition-all" />
+                        <img src={image} alt={`Uploaded ${index}`} className="w-28 h-28 object-cover rounded-lg border-2 border-white/20 group-hover:border-purple-400 transition-all" />
                         <div className="absolute top-1 right-1 flex flex-col space-y-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button onClick={() => removeImage(index)} className="p-1 bg-black/50 rounded-full text-white hover:bg-black/70">
                             <CloseIcon />
@@ -648,7 +742,13 @@ export default function CraftPostGenerator() {
                   <label className="block text-white font-medium mb-2">Craft Your Message</label>
                   <div className="flex items-start gap-3">
                     <textarea
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
                       placeholder={isAIDisabled ? "You have selected auto AI description generation." : "add a background story or describe the art."}
+                      className="flex-1 p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 resize-none"
+                      rows={4}
+                      disabled={isAIDisabled}
+                    ></textarea>
                     <div className="flex flex-col gap-2">
                       <button className="p-3 bg-purple-600 hover:bg-purple-700 rounded-full text-white transition-colors shadow-lg">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -672,15 +772,24 @@ export default function CraftPostGenerator() {
                 <div>
                   <h5 className="text-lg text-white mb-4">Set Your Stage</h5>
                   <div className="grid grid-cols-3 gap-3">
-                    <button className="p-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg text-left transition-all transform hover:scale-105 shadow-lg">
+                    <button
+                      onClick={() => setPostType("Shop Drop")}
+                      className={`p-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg text-left transition-all transform hover:scale-105 shadow-lg ${postType === 'Shop Drop' ? 'ring-2 ring-purple-400' : ''}`}
+                    >
                       <div className="font-bold text-base mb-1">Shop Drop</div>
                       <div className="text-xs opacity-90">Create an elegant post to showcase the fine details of your art.</div>
                     </button>
-                    <button className="p-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg text-left transition-all transform hover:scale-105 shadow-lg">
+                    <button
+                      onClick={() => setPostType("Unfold the Tale")}
+                      className={`p-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg text-left transition-all transform hover:scale-105 shadow-lg ${postType === 'Unfold the Tale' ? 'ring-2 ring-purple-400' : ''}`}
+                    >
                       <div className="font-bold text-base mb-1">Unfold the Tale</div>
                       <div className="text-xs opacity-90">Share the story behind your work—from inspiration to creation.</div>
                     </button>
-                    <button className="p-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg text-left transition-all transform hover:scale-105 shadow-lg">
+                    <button
+                      onClick={() => setPostType("Art Spotlight")}
+                      className={`p-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg text-left transition-all transform hover:scale-105 shadow-lg ${postType === 'Art Spotlight' ? 'ring-2 ring-purple-400' : ''}`}
+                    >
                       <div className="font-bold text-base mb-1">Art Spotlight</div>
                       <div className="text-xs opacity-90">Generate a sales-focused post with a clear call-to-action.</div>
                     </button>
@@ -841,8 +950,3 @@ export default function CraftPostGenerator() {
     </div>
   );
 }
-
-// Narrow navigator.share typing for feature detection without using `any`
-type ShareNavigator = Navigator & {
-  share?: (data: { files?: File[]; title?: string; text?: string }) => Promise<void>;
-};
