@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, ChangeEvent, DragEvent, useEffect } from 'react';
+import NextImage from 'next/image';
 
 // Helper function to extract dominant color (simplified for example)
 const getDominantColor = (imgSrc: string, fallbackColor: string = '#ffffff'): Promise<string> => {
@@ -336,7 +337,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpload, on
                             <div className="flex items-center justify-between w-full">
                                 <div className="flex items-center space-x-3 overflow-hidden">
                                     {file.type === 'image' && file.preview && (
-                                        <img src={file.preview} alt="" className="w-10 h-10 object-cover rounded flex-shrink-0" />
+                                        <NextImage src={file.preview} alt="" width={40} height={40} className="w-10 h-10 object-cover rounded flex-shrink-0" unoptimized />
                                     )}
                                     {file.type === 'video' && (
                                         <video src={file.src} className="w-10 h-10 object-cover rounded flex-shrink-0" muted preload="metadata" />

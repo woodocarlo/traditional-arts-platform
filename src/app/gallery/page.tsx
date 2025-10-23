@@ -43,7 +43,6 @@ interface UploadedFile {
 }
 
 import { translations } from '../../lib/translations';
-import { Translation } from '../../types';
 
 // --- Background Image Data (Using Public Assets) ---
 const overlayImages = [

@@ -96,7 +96,7 @@ const HeroSection = ({ t }: { t: Translation }) => {
   useEffect(() => {
     const interval = setInterval(next, 7000);
     return () => clearInterval(interval);
-  }, [slides.length]);
+  }, [slides.length, next]);
 
   return (
     <div className="relative min-h-screen text-white overflow-hidden bg-gradient-to-b from-black to-[#1a0303]">
