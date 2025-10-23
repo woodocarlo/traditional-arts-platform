@@ -27,13 +27,13 @@ const MODEL_VIEWER_SCRIPT_URL =
 const getImageDimensions = (
   url: string
 ): Promise<{ width: number; height: number }> => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = "Anonymous";
     img.onload = () => {
       resolve({ width: img.width, height: img.height });
     };
-    img.onerror = (err) => {
+    img.onerror = (err: string | Event) => {
       console.error("Error loading image for dimensions:", err);
       resolve({ width: 1, height: 1 });
     };
@@ -56,7 +56,7 @@ export default function ARViewer({ paintingUrl, onClose }: ARViewerProps) {
   const [showTutorial, setShowTutorial] = useState(true);
 
   const modelBlobUrlRef = useRef<string | null>(null);
-  const modelViewerRef = useRef<any>(null);
+  const modelViewerRef = useRef<HTMLElement>(null);
   const tutorialTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Effect to load the model-viewer script
@@ -118,21 +118,23 @@ export default function ARViewer({ paintingUrl, onClose }: ARViewerProps) {
         const exporter = new GLTFExporter();
         exporter.parse(
           scene,
-          (gltf) => {
-            const blob = new Blob([gltf as ArrayBuffer], { type: "model/gltf-binary" });
-            const url = URL.createObjectURL(blob);
-            modelBlobUrlRef.current = url;
-            setModelUrl(url);
-            setProgress(100);
-            
-            // Auto-hide tutorial after 8 seconds
-            tutorialTimeoutRef.current = setTimeout(() => {
-              setShowTutorial(false);
-            }, 8000);
-            
-            setTimeout(() => setIsLoading(false), 500);
+          (gltf: ArrayBuffer | { [key: string]: unknown }) => {
+            if (gltf instanceof ArrayBuffer) {
+              const blob = new Blob([gltf], { type: "model/gltf-binary" });
+              const url = URL.createObjectURL(blob);
+              modelBlobUrlRef.current = url;
+              setModelUrl(url);
+              setProgress(100);
+
+              // Auto-hide tutorial after 8 seconds
+              tutorialTimeoutRef.current = setTimeout(() => {
+                setShowTutorial(false);
+              }, 8000);
+
+              setTimeout(() => setIsLoading(false), 500);
+            }
           },
-          (error) => {
+          (error: ErrorEvent) => {
             console.error("An error happened during GLTF export:", error);
             setError("Could not generate 3D model.");
             setIsLoading(false);
@@ -277,7 +279,7 @@ export default function ARViewer({ paintingUrl, onClose }: ARViewerProps) {
 
               {/* Model Viewer */}
               {React.createElement('model-viewer', {
-                ref: (el: any) => { modelViewerRef.current = el; },
+                ref: (el: HTMLElement | null) => { modelViewerRef.current = el; },
                 src: modelUrl,
                 ar: true,
                 'ar-modes': "webxr scene-viewer quick-look",
@@ -311,13 +313,13 @@ export default function ARViewer({ paintingUrl, onClose }: ARViewerProps) {
                   boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
                   transition: "all 0.3s ease",
                 },
-                onMouseOver: (e: any) => {
-                  e.target.style.backgroundColor = "#FFD700";
-                  e.target.style.transform = "translateX(-50%) scale(1.05)";
+                onMouseOver: (e: React.MouseEvent<HTMLButtonElement>) => {
+                  (e.target as HTMLButtonElement).style.backgroundColor = "#FFD700";
+                  (e.target as HTMLButtonElement).style.transform = "translateX(-50%) scale(1.05)";
                 },
-                onMouseOut: (e: any) => {
-                  e.target.style.backgroundColor = "#F4C430";
-                  e.target.style.transform = "translateX(-50%) scale(1)";
+                onMouseOut: (e: React.MouseEvent<HTMLButtonElement>) => {
+                  (e.target as HTMLButtonElement).style.backgroundColor = "#F4C430";
+                  (e.target as HTMLButtonElement).style.transform = "translateX(-50%) scale(1)";
                 }
               }, "View in Your Room (AR)"))}
                     
