@@ -1,16 +1,12 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-// We will dynamically load the model-viewer script to ensure it's available.
-// import "https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/model-viewer.min.js"; // Removed for dynamic loading
 import * as THREE from "three";
 import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter.js";
 
-
-
 // Helper function to load a script dynamically
 const loadScript = (src: string) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => { // <-- 'reject' must be here
     // Check if script is already loaded
     if (document.querySelector(`script[src="${src}"]`)) {
       resolve(true);
@@ -20,7 +16,7 @@ const loadScript = (src: string) => {
     script.src = src;
     script.type = "module"; // model-viewer is a module
     script.onload = () => resolve(true);
-    script.onerror = () => reject(new Error(`Failed to load script ${src}`));
+    script.onerror = () => reject(new Error(`Failed to load script ${src}`)); // This line needs 'reject'
     document.head.appendChild(script);
   });
 };
@@ -32,7 +28,7 @@ const MODEL_VIEWER_SCRIPT_URL =
 const getImageDimensions = (
   url: string
 ): Promise<{ width: number; height: number }> => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => { // <-- See? No 'reject' here.
     const img = new Image();
     // Allow cross-origin images (like from postimg.cc)
     img.crossOrigin = "Anonymous";
@@ -68,7 +64,6 @@ export default function ARViewer({ paintingUrl, onClose }: ARViewerProps) {
     loadScript(MODEL_VIEWER_SCRIPT_URL)
       .then(() => {
         setIsScriptLoaded(true);
-        // Note: We don't stop loading here, we wait for the model generation effect
       })
       .catch((err) => {
         console.error(err);
@@ -79,14 +74,11 @@ export default function ARViewer({ paintingUrl, onClose }: ARViewerProps) {
 
   // Effect to create the 3D model
   useEffect(() => {
-    // Wait for the script to be loaded and paintingUrl to be present
     if (!isScriptLoaded || !paintingUrl) {
       if (isScriptLoaded && !paintingUrl) {
         setError("No painting URL provided.");
         setIsLoading(false);
       }
-      // If script isn't loaded yet, do nothing and wait.
-      // The loading state is still true from the first effect.
       return;
     }
 
@@ -95,45 +87,42 @@ export default function ARViewer({ paintingUrl, onClose }: ARViewerProps) {
 
     const createModel = async () => {
       try {
-        // 1. Get image dimensions from the URL (works for data: and https:)
         const { width, height } = await getImageDimensions(paintingUrl);
         const aspectRatio = height / width;
-
-        // Define a standard width (e.g., 1 meter)
-        // You could pass real dimensions here as props if you have them
         const planeWidth = 1.0;
         const planeHeight = planeWidth * aspectRatio;
-
-        // 2. Create a Three.js scene
         const scene = new THREE.Scene();
-
-        // 3. Load the painting as a texture
         const textureLoader = new THREE.TextureLoader();
-        // Enable cross-origin loading for external URLs
         textureLoader.setCrossOrigin("Anonymous");
 
         const texture = await textureLoader.loadAsync(paintingUrl);
         texture.colorSpace = THREE.SRGBColorSpace;
-        texture.flipY = false; // Important for GLB export
 
-        // 4. Create a flat plane with the painting texture
+        // --- FIX FOR INVERTED IMAGE ---
+        // This must be true to correct the inversion.
+        texture.flipY = true;
+
+        // --- FIX FOR GREY SCREEN ---
+        // Using MeshStandardMaterial so it reacts to the room's light
+        const material = new THREE.MeshStandardMaterial({
+          map: texture,
+          metalness: 0.1, // A little less flat
+          roughness: 0.8,
+        });
+
+        // We need to pass the geometry to the Mesh
         const geometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
-        const material = new THREE.MeshBasicMaterial({ map: texture });
         const plane = new THREE.Mesh(geometry, material);
         scene.add(plane);
 
-        // 5. Export the scene to GLB format
         const exporter = new GLTFExporter();
         exporter.parse(
           scene,
           (gltf) => {
-            // The exporter gives us an ArrayBuffer (binary GLB data)
             const blob = new Blob([gltf as ArrayBuffer], { type: "model/gltf-binary" });
-
-            // Create a local URL for this in-memory 3D model
             const url = URL.createObjectURL(blob);
-            modelBlobUrlRef.current = url; // Save for cleanup
-            setModelUrl(url); // Set the URL for <model-viewer>
+            modelBlobUrlRef.current = url;
+            setModelUrl(url);
             setIsLoading(false);
           },
           (error) => {
@@ -141,7 +130,7 @@ export default function ARViewer({ paintingUrl, onClose }: ARViewerProps) {
             setError("Could not generate 3D model.");
             setIsLoading(false);
           },
-          { binary: true } // We want a .glb file
+          { binary: true }
         );
       } catch (error) {
         console.error("Error creating model:", error);
@@ -152,15 +141,19 @@ export default function ARViewer({ paintingUrl, onClose }: ARViewerProps) {
 
     createModel();
 
-    // Cleanup function: Revoke the old object URL to prevent memory leaks
     return () => {
       if (modelBlobUrlRef.current) {
         URL.revokeObjectURL(modelBlobUrlRef.current);
         modelBlobUrlRef.current = null;
       }
-      setModelUrl(null); // Clear the model URL
+      setModelUrl(null);
     };
-  }, [paintingUrl, isScriptLoaded]); // Re-run whenever the paintingUrl OR isScriptLoaded changes
+  }, [paintingUrl, isScriptLoaded]);
+
+  // --- FIX FOR GREY SCREEN ---
+  // This is an official <model-viewer> asset URL, guaranteed to work.
+  const virtualRoomUrl =
+    "https://modelviewer.dev/shared-assets/environments/spruit_sunrise_1k.hdr";
 
   return (
     <div
@@ -196,38 +189,39 @@ export default function ARViewer({ paintingUrl, onClose }: ARViewerProps) {
           {error && <p className="text-red-500">{error}</p>}
 
           {!isLoading && !error && modelUrl && isScriptLoaded && (
-            // We must use lowercase 'model-viewer' for the web component
             React.createElement('model-viewer', {
               src: modelUrl,
               ar: true,
               'ar-modes': "webxr scene-viewer quick-look",
               'camera-controls': true,
-              'auto-rotate': true,
+              'camera-orbit': "10deg 75deg 1.5m",
               style: { width: "100%", height: "100%" },
               alt: "3D model of the painting",
-              exposure: "1.2",
+              exposure: "1.0",
               'shadow-intensity': "1",
-              'environment-image': "neutral"
-            }, React.createElement('button', {
-              slot: "ar-button",
-              style: {
-                backgroundColor: "#F4C430", // Your theme color
-                color: "black",
-                border: "none",
-                borderRadius: "8px",
-                padding: "12px 24px",
-                fontSize: "16px",
-                fontWeight: "600",
-                cursor: "pointer",
-                position: "absolute",
-                bottom: "20px",
-                left: "50%",
-                transform: "translateX(-50%)",
-              }
-            }, "View in Your Room (AR)"))
+              'environment-image': virtualRoomUrl,
+              'skybox-image': virtualRoomUrl,
+            },
+              React.createElement('button', {
+                slot: "ar-button",
+                style: {
+                  backgroundColor: "#F4C430",
+                  color: "black",
+                  border: "none",
+                  borderRadius: "8px",
+                  padding: "12px 24px",
+                  fontSize: "16px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  position: "absolute",
+                  bottom: "20px",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                }
+              }, "View in Your Room (AR)")
+            )
           )}
 
-          {/* Show loading message while script loads but model isn't yet generating */}
           {!isLoading && !error && !modelUrl && isScriptLoaded && (
             <p>Generating AR model...</p>
           )}

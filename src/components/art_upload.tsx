@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-
+import Image from 'next/image';
 
 import Header from './Header';
 // import UploadModal from './UploadModal';
@@ -48,10 +48,12 @@ const imagePlacements = [
 const RoyalBackground = () => (
   <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
     {imagePlacements.map((style, index) => (
-      <img
+      <Image
         key={index}
         src={overlayImages[index % overlayImages.length]}
         alt="Decorative background pattern"
+        width={256}
+        height={256}
         className={`absolute mix-blend-luminosity opacity-60 ${
           index % 2 === 0 ? 'w-36 md:w-48' : 'w-56 md:w-72'
         }`}
@@ -117,9 +119,11 @@ export default function GalleryPage() {
         </div>
         
         <div className="relative z-10 pt-20"> {/* Padding to clear fixed header */}
-          <img
+          <Image
               src='https://i.postimg.cc/cLsbbXqH/Add-a-little-bit-of-body-text-1.png'
               alt="Peacock decoration"
+              width={224}
+              height={224}
               className="absolute top-52 left-4 md:left-12 lg:left-24 w-40 md:w-56 transform -rotate-12 opacity-80 hidden sm:block pointer-events-none"
           />
           
@@ -156,7 +160,7 @@ export default function GalleryPage() {
               {galleryItems.map(item => (
                 <div key={item.id} className="break-inside-avoid mb-4">
                   <div className="bg-slate-900/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
-                    <img src={item.src} alt={item.alt} className="w-full h-auto object-cover" style={{ height: `${item.height}px` }}
+                    <Image src={item.src} alt={item.alt} width={400} height={item.height} className="w-full h-auto object-cover"
                       onError={(e) => {
                           e.currentTarget.onerror = null;
                           e.currentTarget.src = 'https://placehold.co/400x300/1E293B/FFFFFF?text=Art';

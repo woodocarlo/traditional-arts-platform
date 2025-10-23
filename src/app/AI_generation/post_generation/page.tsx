@@ -1,6 +1,7 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import axios from "axios";
+import Image from 'next/image';
 import { generateBackground, generateCenter, generateOverlay } from "./apiService";
 
 // Placeholder for API keys (use environment variables in production)
@@ -69,16 +70,11 @@ export default function CraftPostGenerator() {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [currentStep, setCurrentStep] = useState<number>(0);
-  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const canvasRefs = useRef<(HTMLCanvasElement | null)[]>([]);
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const [isAIDisabled, setIsAIDisabled] = useState<boolean>(false);
   const [description, setDescription] = useState<string>("");
   const [postType, setPostType] = useState<string>("Shop Drop");
-
-  const uploadSteps = [
-    'Uploading image...', 
-  ];
 
   const generationSteps = [
     'Generating design variations...', 
@@ -291,34 +287,33 @@ export default function CraftPostGenerator() {
     const baseSize = Math.min(canvasWidth, canvasHeight) * sizeVariation;
     const minSize = Math.min(canvasWidth, canvasHeight) * 0.4;
     const maxSize = Math.min(canvasWidth, canvasHeight) * 0.8;
-    const aspectRatio = imageDimensions.width / imageDimensions.height;
-    
+
     let width, height;
-    
-    if (aspectRatio > 1) {
+
+    if (canvasWidth > canvasHeight) {
       width = baseSize;
-      height = baseSize / aspectRatio;
+      height = baseSize * (canvasHeight / canvasWidth);
     } else {
-      width = baseSize * aspectRatio;
+      width = baseSize * (canvasWidth / canvasHeight);
       height = baseSize;
     }
-    
+
     if (width < minSize) {
       width = minSize;
-      height = minSize / aspectRatio;
+      height = minSize * (canvasHeight / canvasWidth);
     } else if (width > maxSize) {
       width = maxSize;
-      height = maxSize / aspectRatio;
+      height = maxSize * (canvasHeight / canvasWidth);
     }
-    
+
     if (height < minSize) {
       height = minSize;
-      width = minSize * aspectRatio;
+      width = minSize * (canvasWidth / canvasHeight);
     } else if (height > maxSize) {
       height = maxSize;
-      width = maxSize * aspectRatio;
+      width = maxSize * (canvasWidth / canvasHeight);
     }
-    
+
     return { width, height };
   };
 
@@ -333,108 +328,12 @@ export default function CraftPostGenerator() {
     }
   };
 
-  const drawPostToCanvas = (post: GeneratedPost, index: number) => {
-    const canvas = canvasRefs.current[index];
-    if (!canvas) return; 
-    
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return; 
-    
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    let canvasWidth, canvasHeight;
-    if (aspectRatio === "3:4") {
-      canvasWidth = 300;
-      canvasHeight = 400;
-    } else if (aspectRatio === "1:1") {
-      canvasWidth = 350;
-      canvasHeight = 350;
-    } else {
-      canvasWidth = 270;
-      canvasHeight = 480;
-    }
-    
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-    
-    const bgImg = new Image();
-    bgImg.onload = () => {
-      const bgAspect = bgImg.width / bgImg.height;
-      const canvasAspect = canvasWidth / canvasHeight;
-      
-      let bgRenderWidth, bgRenderHeight, bgX, bgY;
-      
-      if (bgAspect > canvasAspect) {
-        bgRenderHeight = canvasHeight;
-        bgRenderWidth = bgImg.width * (canvasHeight / bgImg.height);
-        bgX = (canvasWidth - bgRenderWidth) / 2;
-        bgY = 0;
-      } else {
-        bgRenderWidth = canvasWidth;
-        bgRenderHeight = bgImg.height * (canvasWidth / bgImg.width);
-        bgX = 0;
-        bgY = (canvasHeight - bgRenderHeight) / 2;
-      }
-      
-      ctx.drawImage(bgImg, bgX, bgY, bgRenderWidth, bgRenderHeight);
-      
-      if (post.centerUrl && post.centerUrl !== "none") {
-        const centerImg = new Image();
-        centerImg.onload = () => {
-          const centerAspect = centerImg.width / centerImg.height;
-          
-          let centerRenderWidth, centerRenderHeight, centerX, centerY;
-          
-          if (centerAspect > canvasAspect) {
-            centerRenderHeight = canvasHeight;
-            centerRenderWidth = centerImg.width * (canvasHeight / centerImg.height);
-            centerX = (canvasWidth - centerRenderWidth) / 2;
-            centerY = 0;
-          } else {
-            centerRenderWidth = canvasWidth;
-            centerRenderHeight = centerImg.height * (canvasWidth / centerImg.width);
-            centerX = 0;
-            centerY = (canvasHeight - centerRenderHeight) / 2;
-          }
-          
-          ctx.drawImage(centerImg, centerX, centerY, centerRenderWidth, centerRenderHeight);
-          drawProcessedImage(ctx, canvasWidth, canvasHeight, index);
-          
-          if (post.overlayUrl && post.overlayUrl !== "none") {
-            const overlayImg = new Image();
-            overlayImg.onload = () => {
-              ctx.globalAlpha = post.opacity ?? 1.0;
-              ctx.drawImage(overlayImg, 0, 0, canvasWidth, canvasHeight);
-              ctx.globalAlpha = 1.0;
-            };
-            overlayImg.src = post.overlayUrl;
-          }
-        };
-        centerImg.src = post.centerUrl;
-      } else {
-        drawProcessedImage(ctx, canvasWidth, canvasHeight, index);
-        
-        if (post.overlayUrl && post.overlayUrl !== "none") {
-          const overlayImg = new Image();
-          overlayImg.onload = () => {
-            ctx.globalAlpha = post.opacity ?? 1.0;
-            ctx.drawImage(overlayImg, 0, 0, canvasWidth, canvasHeight);
-            ctx.globalAlpha = 1.0;
-            drawTextElements(ctx, post, canvasWidth, canvasHeight);
-          };
-          overlayImg.src = post.overlayUrl;
-        } else {
-          drawTextElements(ctx, post, canvasWidth, canvasHeight);
-        }
-      }
-    };
-    bgImg.src = post.bgUrl;
-  };
+
 
   const drawProcessedImage = (ctx: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number, index: number) => {
-    if (processedImages.length === 0) return; 
-    
-    const img = new Image();
+     if (processedImages.length === 0) return;
+
+     const img = document.createElement('img') as HTMLImageElement;
     img.onload = () => {
       const size = calculateObjectSize(canvasWidth, canvasHeight, index);
       const x = (canvasWidth - size.width) / 2;
@@ -632,11 +531,109 @@ export default function CraftPostGenerator() {
     }
   };
 
+  const drawPostToCanvasCallback = useCallback((post: GeneratedPost, index: number) => {
+    const canvas = canvasRefs.current[index];
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    let canvasWidth, canvasHeight;
+    if (aspectRatio === "3:4") {
+      canvasWidth = 300;
+      canvasHeight = 400;
+    } else if (aspectRatio === "1:1") {
+      canvasWidth = 350;
+      canvasHeight = 350;
+    } else {
+      canvasWidth = 270;
+      canvasHeight = 480;
+    }
+
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+
+    const bgImg = document.createElement('img') as HTMLImageElement;
+    bgImg.onload = () => {
+      const bgAspect = bgImg.width / bgImg.height;
+      const canvasAspect = canvasWidth / canvasHeight;
+
+      let bgRenderWidth, bgRenderHeight, bgX, bgY;
+
+      if (bgAspect > canvasAspect) {
+        bgRenderHeight = canvasHeight;
+        bgRenderWidth = bgImg.width * (canvasHeight / bgImg.height);
+        bgX = (canvasWidth - bgRenderWidth) / 2;
+        bgY = 0;
+      } else {
+        bgRenderWidth = canvasWidth;
+        bgRenderHeight = bgImg.height * (canvasWidth / bgImg.width);
+        bgX = 0;
+        bgY = (canvasHeight - bgRenderHeight) / 2;
+      }
+
+      ctx.drawImage(bgImg, bgX, bgY, bgRenderWidth, bgRenderHeight);
+
+      if (post.centerUrl && post.centerUrl !== "none") {
+        const centerImg = document.createElement('img') as HTMLImageElement;
+        centerImg.onload = () => {
+          const centerAspect = centerImg.width / centerImg.height;
+
+          let centerRenderWidth, centerRenderHeight, centerX, centerY;
+
+          if (centerAspect > canvasAspect) {
+            centerRenderHeight = canvasHeight;
+            centerRenderWidth = centerImg.width * (canvasHeight / centerImg.height);
+            centerX = (canvasWidth - centerRenderWidth) / 2;
+            centerY = 0;
+          } else {
+            centerRenderWidth = canvasWidth;
+            centerRenderHeight = centerImg.height * (canvasWidth / centerImg.width);
+            centerX = 0;
+            centerY = (canvasHeight - centerRenderHeight) / 2;
+          }
+
+          ctx.drawImage(centerImg, centerX, centerY, centerRenderWidth, centerRenderHeight);
+          drawProcessedImage(ctx, canvasWidth, canvasHeight, index);
+
+          if (post.overlayUrl && post.overlayUrl !== "none") {
+            const overlayImg = document.createElement('img') as HTMLImageElement;
+            overlayImg.onload = () => {
+              ctx.globalAlpha = post.opacity ?? 1.0;
+              ctx.drawImage(overlayImg, 0, 0, canvasWidth, canvasHeight);
+              ctx.globalAlpha = 1.0;
+            };
+            overlayImg.src = post.overlayUrl;
+          }
+        };
+        centerImg.src = post.centerUrl;
+      } else {
+        drawProcessedImage(ctx, canvasWidth, canvasHeight, index);
+
+        if (post.overlayUrl && post.overlayUrl !== "none") {
+          const overlayImg = document.createElement('img') as HTMLImageElement;
+          overlayImg.onload = () => {
+            ctx.globalAlpha = post.opacity ?? 1.0;
+            ctx.drawImage(overlayImg, 0, 0, canvasWidth, canvasHeight);
+            ctx.globalAlpha = 1.0;
+            drawTextElements(ctx, post, canvasWidth, canvasHeight);
+          };
+          overlayImg.src = post.overlayUrl;
+        } else {
+          drawTextElements(ctx, post, canvasWidth, canvasHeight);
+        }
+      }
+    };
+    bgImg.src = post.bgUrl;
+  }, [aspectRatio]);
+
   useEffect(() => {
     generatedPosts.forEach((post, index) => {
-      setTimeout(() => drawPostToCanvas(post, index), 100);
+      setTimeout(() => drawPostToCanvasCallback(post, index), 100);
     });
-  }, [generatedPosts, processedImages]);
+  }, [generatedPosts, processedImages, drawPostToCanvasCallback]);
 
   const onClose = () => {
     if (typeof window !== "undefined") {
@@ -645,7 +642,7 @@ export default function CraftPostGenerator() {
   };
 
   return (
-    <div className="relative min-h-screen p-8 bg-gradient-to-b from-[#1d002a] via-[#2d1b69] to-[#4b006e] text-white font-['Inter',_sans-serif] overflow-hidden">
+    <div className="relative min-h-screen p-8 bg-gradient-to-br from-[#1d002a] via-[#2d1b69] to-[#4b006e] text-white font-['Inter',_sans-serif] overflow-hidden">
       {/* Mandela Pattern Overlay */}
       <div
         className="absolute inset-0 opacity-25 pointer-events-none"
@@ -720,7 +717,7 @@ export default function CraftPostGenerator() {
                   <div className="flex overflow-x-auto space-x-4 py-4 scrollbar-hide" style={{ maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
                     {uploadedImages.map((image, index) => (
                       <div key={index} className="relative group flex-shrink-0">
-                        <img src={image} alt={`Uploaded ${index}`} className="w-28 h-28 object-cover rounded-lg border-2 border-white/20 group-hover:border-purple-400 transition-all" />
+                        <Image src={image} alt={`Uploaded ${index}`} width={112} height={112} className="w-28 h-28 object-cover rounded-lg border-2 border-white/20 group-hover:border-purple-400 transition-all" />
                         <div className="absolute top-1 right-1 flex flex-col space-y-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button onClick={() => removeImage(index)} className="p-1 bg-black/50 rounded-full text-white hover:bg-black/70">
                             <CloseIcon />
@@ -922,7 +919,7 @@ export default function CraftPostGenerator() {
       </div>
 
       {expandedImage && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center"
           onClick={() => setExpandedImage(null)}
         >

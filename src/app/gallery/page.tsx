@@ -212,7 +212,7 @@ export default function GalleryPage() {
           </li>
           <li>
             <p>
-              <strong>View in AR:</strong> Click the "View in AR" button on any photo to see it on your wall using your phone&apos;s camera!
+              <strong>View in AR:</strong> Click the &ldquo;View in AR&rdquo; button on any photo to see it on your wall using your phone&apos;s camera!
             </p>
           </li>
           <li>

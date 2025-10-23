@@ -114,7 +114,7 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
         video: { deviceId: { exact: 'none' } }
       });
       stream.getTracks().forEach(track => track.stop());
-    } catch (err) {
+    } catch {
       // Expected to fail, but this helps ensure camera is off
       console.log('Camera force stop attempted');
     }

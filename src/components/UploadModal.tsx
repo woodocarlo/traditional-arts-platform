@@ -443,7 +443,7 @@ const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, onUpload, on
                     >
                         <div className="absolute inset-0 z-0 opacity-10" style={{ background: `repeating-linear-gradient(45deg, ${file.dominantColor} 0%, transparent 1px, transparent 5px)`, clipPath: 'polygon(0% 0%, 10% 100%, 0% 100%)' }}></div>
                         <div className="absolute inset-0 z-0 opacity-10" style={{ background: `repeating-linear-gradient(-45deg, ${file.dominantColor} 0%, transparent 1px, transparent 5px)`, clipPath: 'polygon(100% 0%, 90% 100%, 100% 100%)' }}></div>
-                        <img src={bgRemovedImages[file.id]} alt={`Background removed ${file.alt}`} className="relative z-10 max-w-[calc(100%-20px)] max-h-[180px] object-contain" />
+                        <NextImage src={bgRemovedImages[file.id]} alt={`Background removed ${file.alt}`} width={400} height={300} className="relative z-10 max-w-[calc(100%-20px)] max-h-[180px] object-contain" />
                     </div>
                   )}
 
