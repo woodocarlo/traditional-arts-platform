@@ -2,31 +2,11 @@
 
 import React, { useEffect, useState, useRef } from "react";
 // We will dynamically load the model-viewer script to ensure it's available.
+// import "https://cdn.jsdelivr.net/npm/@google/model-viewer/dist/model-viewer.min.js"; // Removed for dynamic loading
 import * as THREE from "three";
 import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter.js";
 
-// TypeScript definitions for the <model-viewer> custom element
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      "model-viewer": React.DetailedHTMLProps<
-        React.HTMLAttributes<HTMLElement>,
-        HTMLElement
-      > & {
-        src?: string;
-        ar?: boolean;
-        "ar-modes"?: string;
-        "camera-controls"?: boolean;
-        "auto-rotate"?: boolean;
-        alt?: string;
-        exposure?: string;
-        "shadow-intensity"?: string;
-        "environment-image"?: string;
-        slot?: string;
-      };
-    }
-  }
-}
+
 
 // Helper function to load a script dynamically
 const loadScript = (src: string) => {
@@ -134,11 +114,7 @@ export default function ARViewer({ paintingUrl, onClose }: ARViewerProps) {
 
         const texture = await textureLoader.loadAsync(paintingUrl);
         texture.colorSpace = THREE.SRGBColorSpace;
-        
-        // --- FIX FOR INVERTED IMAGE ---
-        // We are setting this to true (or just removing the line, as true is default)
-        // Your version had 'false', which was causing the inversion.
-        texture.flipY = true; 
+        texture.flipY = false; // Important for GLB export
 
         // 4. Create a flat plane with the painting texture
         const geometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
@@ -220,39 +196,35 @@ export default function ARViewer({ paintingUrl, onClose }: ARViewerProps) {
           {error && <p className="text-red-500">{error}</p>}
 
           {!isLoading && !error && modelUrl && isScriptLoaded && (
-            // Switched back to JSX as it's more readable
-            <model-viewer
-              src={modelUrl}
-              ar
-              ar-modes="webxr scene-viewer quick-look"
-              camera-controls
-              auto-rotate
-              style={{ width: "100%", height: "100%" }}
-              alt="3D model of the painting"
-              exposure="1.2"
-              shadow-intensity="1"
-              environment-image="neutral"
-            >
-              <button
-                slot="ar-button"
-                style={{
-                  backgroundColor: "#F4C430", // Your theme color
-                  color: "black",
-                  border: "none",
-                  borderRadius: "8px",
-                  padding: "12px 24px",
-                  fontSize: "16px",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                  position: "absolute",
-                  bottom: "20px",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                }}
-              >
-                View in Your Room (AR)
-              </button>
-            </model-viewer>
+            // We must use lowercase 'model-viewer' for the web component
+            React.createElement('model-viewer', {
+              src: modelUrl,
+              ar: true,
+              'ar-modes': "webxr scene-viewer quick-look",
+              'camera-controls': true,
+              'auto-rotate': true,
+              style: { width: "100%", height: "100%" },
+              alt: "3D model of the painting",
+              exposure: "1.2",
+              'shadow-intensity': "1",
+              'environment-image': "neutral"
+            }, React.createElement('button', {
+              slot: "ar-button",
+              style: {
+                backgroundColor: "#F4C430", // Your theme color
+                color: "black",
+                border: "none",
+                borderRadius: "8px",
+                padding: "12px 24px",
+                fontSize: "16px",
+                fontWeight: "600",
+                cursor: "pointer",
+                position: "absolute",
+                bottom: "20px",
+                left: "50%",
+                transform: "translateX(-50%)",
+              }
+            }, "View in Your Room (AR)"))
           )}
 
           {/* Show loading message while script loads but model isn't yet generating */}
