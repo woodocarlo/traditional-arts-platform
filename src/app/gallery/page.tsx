@@ -101,10 +101,10 @@ const BackIcon = () => (
 const galleryItems: GalleryItem[] = [
     { id: 1, src: 'https://i.postimg.cc/CLjf6gpY/image.png', alt: 'Madhubani Painting', type: 'image', posts: 12, purchases: 5, date: '2023-10-15' },
     { id: 2, src: 'https://i.postimg.cc/Bn6wBNRc/image.png', alt: 'Warli Art', type: 'image', posts: 8, purchases: 3, date: '2023-09-22' },
-    { id: 3, src: 'https://i.postimg.cc/Tw7KgdbV/image.png', alt: 'Pattachitra', type: 'image', posts: 15, purchases: 7, date: '2023-11-05' },
-    { id: 4, src: 'https://i.postimg.cc/2yS4N9QJ/image.png', alt: 'Tanjore Painting', type: 'image', posts: 6, purchases: 2, date: '2023-08-30' },
-    { id: 5, src: 'https://i.postimg.cc/Lsk4BHcV/719Lgc-Xp4-L-SY879.jpg', alt: 'Blue Pottery', type: 'image', posts: 9, purchases: 4, date: '2025-09-28' },
-    { id: 6, src: 'https://i.postimg.cc/zvZ9dWTr/image.png', alt: 'Home Decor', type: 'image', posts: 11, purchases: 6, date: '2023-09-15' },
+    { id: 3, src: 'https://i.postimg.cc/rmJKy456/image.png', alt: 'Pattachitra', type: 'image', posts: 15, purchases: 7, date: '2023-11-05' },
+    { id: 4, src: 'https://i.postimg.cc/jSPqdNrL/image.png', alt: 'Tanjore Painting', type: 'image', posts: 6, purchases: 2, date: '2023-08-30' },
+    { id: 5, src: 'https://i.postimg.cc/wM2THd86/image.png', alt: 'Mandela Art', type: 'image', posts: 9, purchases: 4, date: '2025-09-28' },
+    { id: 6, src: 'https://i.postimg.cc/R04tvgK4/handmade-downscaled-h-dosx776rss7-2000x2000-91123.jpg', alt: 'Mystical Potrait', type: 'image', posts: 11, purchases: 6, date: '2023-09-15' },
     { id: 7, src: 'https://www.w3schools.com/html/mov_bbb.mp4', alt: 'Traditional Dance', type: 'video', posts: 5, purchases: 2, date: '2023-09-10' },
     { id: 8, src: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav', alt: 'Temple Bells', type: 'audio', posts: 3, purchases: 1, date: '2023-08-25' },
 ];
@@ -711,7 +711,7 @@ export default function GalleryPage() {
                             <h3>{item.alt}</h3>
                             <div className="overlay-stats">
                               <div>
-                                G<strong>{item.posts}</strong>
+                                <strong>{item.posts}</strong>
                                 <div className="text-sm">Posts</div>
                               </div>
                               <div>

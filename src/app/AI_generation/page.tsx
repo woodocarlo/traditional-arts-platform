@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import CreatePostSection from "./CreatePostSection";
 import PostGeneration from "./post_generation/page";
 import PhotoGuidance from "./photo_guidance/page";
+import CreateYourOwn from "./create_your_own/page";
 import { useInstructions } from "@/contexts/InstructionsContext";
 
 // An inline SVG for the back arrow icon
@@ -20,7 +21,7 @@ const BackArrowIcon = () => (
     className="h-6 w-6"
   >
     <path d="M19 12H5" />
-    <path d="M12 19l-7-7 7-7" />
+    <path d="M12 19l-7-7 7-7" />yy
   </svg>
 );
 
@@ -188,6 +189,25 @@ export default function KalaSakhiLandingPage() {
             </li>
           </ul>
         </>
+      ),
+      5: (
+        <>
+          <InstructionsHeader />
+          <ul className="space-y-2 list-disc list-inside text-gray-300">
+            <li>
+              <strong>Upload Your Photo:</strong> Start by uploading an image of your traditional art piece.
+            </li>
+            <li>
+              <strong>Drawing Tools:</strong> Use the brush to add freehand sketches, adjust color and size as needed.
+            </li>
+            <li>
+              <strong>Text Addition:</strong> Add custom text with adjustable color, font size, and various font options by clicking on the canvas.
+            </li>
+            <li>
+              <strong>Edit & Download:</strong> Clear the canvas to start over or download your customized post.
+            </li>
+          </ul>
+        </>
       )
     };
 
@@ -270,14 +290,14 @@ export default function KalaSakhiLandingPage() {
       <main
         className="
           relative
-          flex 
+          flex
           flex-col
-          items-center 
-          justify-start 
-          min-h-screen 
-          w-full 
-          bg-gradient-to-br from-[#1d002a] via-[#2d1b69] to-[#4b006e]
-          text-white 
+          items-center
+          justify-start
+          min-h-screen
+          w-full
+          bg-gradient-to-br from-[#4b006e] via-[#2d1b69] to-[#1d002a]
+          text-white
           font-['Inter',_sans-serif]
           p-4
           pt-24 sm:pt-32
@@ -414,17 +434,20 @@ export default function KalaSakhiLandingPage() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (card.id !== 5) handleCardClick(card.id);
+                        if (card.id === 5) {
+                          setExpandedSection(5);
+                        } else {
+                          handleCardClick(card.id);
+                        }
                       }}
-                      disabled={card.id === 5}
                       className={`px-8 py-3 rounded-lg text-white font-semibold transition-all duration-300
                                  focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-50 shadow-lg
                                  ${card.id === 5
-                                   ? 'bg-gray-500 cursor-not-allowed opacity-50'
+                                   ? 'bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 hover:from-purple-700 hover:via-purple-800 hover:to-pink-700 transform hover:scale-105 hover:shadow-purple-500/25'
                                    : 'bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 hover:from-purple-700 hover:via-purple-800 hover:to-pink-700 transform hover:scale-105 hover:shadow-purple-500/25'
                                  }`}
                     >
-                      {card.buttonText}
+                      {card.id === 5 ? 'Open Studio' : card.buttonText}
                     </button>
                   </div>
                 </div>
@@ -438,7 +461,7 @@ export default function KalaSakhiLandingPage() {
           {expandedSection && (
             <div
               ref={expandedSectionRef}
-              className="w-full bg-gradient-to-br from-[#1d002a] via-[#2d1b69] to-[#4b006e] relative"
+              className="w-full bg-gradient-to-bl from-[#1d002a] via-[#2d1b69] to-[#4b006e] relative"
             >
               {/* Mandela Pattern Overlay */}
               <div
@@ -456,6 +479,8 @@ export default function KalaSakhiLandingPage() {
                   <PhotoGuidance />
                 ) : expandedSection === 4 ? (
                   <PostGeneration />
+                ) : expandedSection === 5 ? (
+                  <CreateYourOwn />
                 ) : (
                   (() => {
                     const card = cardData.find(
