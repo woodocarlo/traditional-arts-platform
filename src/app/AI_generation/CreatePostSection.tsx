@@ -206,7 +206,7 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
       
       const { script } = await scriptResponse.json();
       setCurrentStep(1);
-      
+
       const saveResponse = await fetch('/api/podcast/save-podcast', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

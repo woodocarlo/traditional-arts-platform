@@ -810,7 +810,7 @@ export default function CraftPostGenerator() {
                 <div className="h-64 bg-gray-700 rounded-lg flex items-center justify-center relative overflow-hidden">
                   <div className="w-[150px] h-[200px] bg-white/10 border-white/40 border-2 rounded relative">
                     <svg className="absolute w-full h-full" viewBox="0 0 150 200" preserveAspectRatio="none">
-                      <line x1="0" y1="0" x2="150" y2="200" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-dasharray="4 4" />
+                      <line x1="0" y1="0" x2="150" y2="200" stroke="rgba(255,255,255,0.2)" strokeWidth="2" strokeDasharray="4 4" />
                     </svg>
                   </div>
                   <p className="absolute text-white font-semibold bottom-4">Portrait (3:4)</p>
@@ -826,7 +826,7 @@ export default function CraftPostGenerator() {
                 <div className="h-64 bg-gray-700 rounded-lg flex items-center justify-center relative overflow-hidden">
                   <div className="w-[100px] h-[200px] bg-white/10 border-white/40 border-2 rounded relative">
                     <svg className="absolute w-full h-full" viewBox="0 0 100 200" preserveAspectRatio="none">
-                      <line x1="0" y1="0" x2="100" y2="200" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-dasharray="4 4" />
+                      <line x1="0" y1="0" x2="100" y2="200" stroke="rgba(255,255,255,0.2)" strokeWidth="2" strokeDasharray="4 4" />
                     </svg>
                   </div>
                   <p className="absolute text-white font-semibold bottom-4">Story (9:16)</p>
@@ -842,7 +842,7 @@ export default function CraftPostGenerator() {
                 <div className="h-64 bg-gray-700 rounded-lg flex items-center justify-center relative overflow-hidden">
                   <div className="w-[150px] h-[150px] bg-white/10 border-white/40 border-2 rounded relative">
                     <svg className="absolute w-full h-full" viewBox="0 0 150 150" preserveAspectRatio="none">
-                      <line x1="0" y1="0" x2="150" y2="150" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-dasharray="4 4" />
+                      <line x1="0" y1="0" x2="150" y2="150" stroke="rgba(255,255,255,0.2)" strokeWidth="2" strokeDasharray="4 4" />
                     </svg>
                   </div>
                   <p className="absolute text-white font-semibold bottom-4">Post (1:1)</p>
