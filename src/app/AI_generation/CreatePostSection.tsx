@@ -495,8 +495,8 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
               <input
                 type="text"
                 value={podcastConfig.hostName}
-                onChange={(e) => setPodcastConfig(prev => ({...prev, hostName: e.target.value}))}
-                className="w-full p-3 bg-black/30 border border-white/20 rounded-lg text-white focus:outline-none focus:border-purple-400"
+                disabled={true}
+                className="w-full p-3 bg-black/30 border border-white/20 rounded-lg text-white focus:outline-none focus:border-purple-400 opacity-50 cursor-not-allowed"
                 placeholder="Enter host name"
               />
             </div>
@@ -505,8 +505,8 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
               <input
                 type="text"
                 value={podcastConfig.participantName}
-                onChange={(e) => setPodcastConfig(prev => ({...prev, participantName: e.target.value}))}
-                className="w-full p-3 bg-black/30 border border-white/20 rounded-lg text-white focus:outline-none focus:border-purple-400"
+                disabled={true}
+                className="w-full p-3 bg-black/30 border border-white/20 rounded-lg text-white focus:outline-none focus:border-purple-400 opacity-50 cursor-not-allowed"
                 placeholder="Enter participant name"
               />
             </div>
