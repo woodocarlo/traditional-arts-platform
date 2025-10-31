@@ -48,7 +48,9 @@ export async function POST(request: NextRequest) {
 
     // Create prompt based on postType and description
     let prompt = '';
-    if (postType === 'Shop Drop') {
+    if (postType === 'general') {
+      prompt = `Generate an image based on the following description: ${description}`;
+    } else if (postType === 'Shop Drop') {
       prompt = `Generate an elegant, sophisticated background suitable for showcasing fine craft details. The background should be minimalist and luxurious, complementing traditional craftsmanship. Description: ${description}`;
     } else if (postType === 'Unfold the Tale') {
       prompt = `Generate an inspiring, story-like background that evokes creativity and tradition. The background should have a warm, narrative feel suitable for sharing artisan stories. Description: ${description}`;

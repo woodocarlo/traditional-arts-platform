@@ -49,7 +49,9 @@ export async function POST(request: NextRequest) {
     // Create prompt for center image
     let prompt = `Generate a decorative center element or focal point suitable for a traditional craft social media post. The element should be elegant and complementary to craftsmanship. Description: ${description}`;
 
-    if (postType === 'Shop Drop') {
+    if (postType === 'general') {
+      prompt = `Generate an image based on the following description: ${description}`;
+    } else if (postType === 'Shop Drop') {
       prompt = `Generate an elegant decorative element that highlights fine craft details, like ornate borders or artistic motifs. Description: ${description}`;
     } else if (postType === 'Unfold the Tale') {
       prompt = `Generate a creative, story-inspired decorative element that evokes tradition and craftsmanship. Description: ${description}`;

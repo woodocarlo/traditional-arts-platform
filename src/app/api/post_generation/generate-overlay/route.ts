@@ -49,7 +49,9 @@ export async function POST(request: NextRequest) {
     // Create prompt for overlay
     let prompt = `Generate a subtle overlay texture or pattern that adds depth and interest to a traditional craft social media post. The overlay should be semi-transparent and complementary. Description: ${description}`;
 
-    if (postType === 'Shop Drop') {
+    if (postType === 'general') {
+      prompt = `Generate an image based on the following description: ${description}`;
+    } else if (postType === 'Shop Drop') {
       prompt = `Generate an elegant, subtle overlay with luxurious textures or patterns that enhance the presentation of fine crafts. Description: ${description}`;
     } else if (postType === 'Unfold the Tale') {
       prompt = `Generate a creative overlay with artistic textures that evoke storytelling and tradition. Description: ${description}`;

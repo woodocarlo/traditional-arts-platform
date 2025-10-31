@@ -36,8 +36,78 @@ const HelpIcon = () => (
   </svg>
 );
 
+// --- Product Interface ---
+interface Product {
+  id: number;
+  name: string;
+  category: string;
+  basePrice: number;
+  description: string;
+  image: string;
+  productionTime: number;
+  materialCost: number;
+  initialMarketingCost: number;
+}
+
+// --- Simulation State Interface ---
+interface SimulationState {
+  price: number;
+  sales: number;
+  earnings: number;
+  marketingCost: number;
+  marketDemand: number;
+  customerSatisfaction: number;
+  weeksRunning: number;
+  totalProfit: number;
+}
+
+// --- History Entry Interface ---
+interface HistoryEntry {
+  price: number;
+  earnings: number;
+  sales: number;
+  marketingCost: number;
+  week: number;
+}
+
+// --- Strategy Type ---
+type Strategy = 'high_demand' | 'low_demand' | 'profit_max' | 'market_penetration' | 'balanced';
+
+// --- Component Props Interfaces ---
+interface DashboardStatCardProps {
+  label: string;
+  value: string;
+  trend?: number | null;
+  size?: 'normal' | 'large';
+}
+
+interface SimulationButtonProps {
+  onClick: () => void;
+  children: React.ReactNode;
+  className?: string;
+  icon?: string | null;
+  disabled?: boolean;
+}
+
+interface ToggleButtonProps {
+  label: string;
+  enabled: boolean;
+  onToggle: () => void;
+}
+
+interface CompactLineChartProps {
+  data: Array<{ price: number; earnings: number }> | null;
+  width?: number;
+  height?: number;
+}
+
+interface InstructionsPopupProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
 // --- Product Database with Indian Art & Crafts ---
-const PRODUCTS = [
+const PRODUCTS: Product[] = [
   {
     id: 1,
     name: "Golden Elephant",
@@ -74,7 +144,7 @@ const PRODUCTS = [
 ];
 
 // --- Helper Function to Format Currency in Rupees ---
-const formatRupees = (amount) => {
+const formatRupees = (amount: number): string => {
   if (amount >= 10000000) { // 1 crore
     return `₹${(amount / 10000000).toFixed(2)}Cr`;
   } else if (amount >= 100000) { // 1 lakh
@@ -86,7 +156,7 @@ const formatRupees = (amount) => {
 };
 
 // --- Instructions Popup Component ---
-const InstructionsPopup = ({ isOpen, onClose }) => {
+const InstructionsPopup = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   if (!isOpen) return null;
 
   return (
@@ -143,7 +213,7 @@ const InstructionsPopup = ({ isOpen, onClose }) => {
 
 // --- Compact Helper Components ---
 
-const DashboardStatCard = ({ label, value, trend = null, size = "normal" }) => (
+const DashboardStatCard: React.FC<DashboardStatCardProps> = ({ label, value, trend = null, size = "normal" }) => (
   <div className="bg-slate-700/50 p-3 rounded-lg border border-slate-600/30 backdrop-blur-sm">
     <p className="text-xs text-slate-400 mb-1 font-medium">
       {label}
@@ -161,7 +231,7 @@ const DashboardStatCard = ({ label, value, trend = null, size = "normal" }) => (
   </div>
 );
 
-const SimulationButton = ({ onClick, children, className = '', icon = null, disabled = false }) => (
+const SimulationButton: React.FC<SimulationButtonProps> = ({ onClick, children, className = '', icon = null, disabled = false }) => (
   <button
     onClick={onClick}
     disabled={disabled}
@@ -172,7 +242,7 @@ const SimulationButton = ({ onClick, children, className = '', icon = null, disa
   </button>
 );
 
-const ToggleButton = ({ label, enabled, onToggle }) => (
+const ToggleButton: React.FC<ToggleButtonProps> = ({ label, enabled, onToggle }) => (
   <div className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg border border-slate-600/30">
     <div className="flex-1 min-w-0">
       <label className="text-sm font-semibold text-white block truncate">
@@ -193,7 +263,7 @@ const ToggleButton = ({ label, enabled, onToggle }) => (
 );
 
 // --- Compact Line Chart Component ---
-const CompactLineChart = ({ data, width = 280, height = 120 }) => {
+const CompactLineChart: React.FC<CompactLineChartProps> = ({ data, width = 280, height = 120 }) => {
   if (!data || data.length < 2) {
     return (
       <div className="flex items-center justify-center w-full h-[120px] bg-slate-700/30 rounded-lg border border-slate-600/30 text-slate-400 text-xs">
@@ -214,12 +284,12 @@ const CompactLineChart = ({ data, width = 280, height = 120 }) => {
   const minEarnings = Math.min(...earnings);
   const maxEarnings = Math.max(...earnings);
 
-  const scaleX = (price) => {
+  const scaleX = (price: number) => {
     return padding.left + (price - minPrice) / (maxPrice - minPrice || 1) * chartWidth;
   };
 
-  const scaleY = (earning) => {
-    return padding.top + chartHeight - (earning - minEarnings) / (maxEarnings - minEarnings || 1) * chartHeight;
+  const scaleY = (earnings: number) => {
+    return padding.top + chartHeight - (earnings - minEarnings) / (maxEarnings - minEarnings || 1) * chartHeight;
   };
 
   return (
@@ -291,7 +361,14 @@ const CompactLineChart = ({ data, width = 280, height = 120 }) => {
 
 // --- AI Simulation Logic with Realistic Limits ---
 class AIPricingSimulation {
-  constructor(product) {
+  product: Product;
+  state: SimulationState;
+  history: HistoryEntry[];
+  maxPrice: number;
+  maxWeeklySales: number;
+  profitSaturation: number;
+
+  constructor(product: Product) {
     this.product = product;
     this.state = {
       price: product.basePrice,
@@ -310,21 +387,21 @@ class AIPricingSimulation {
       marketingCost: this.state.marketingCost,
       week: 0
     }];
-    
+
     // Realistic limits for traditional crafts business
     this.maxPrice = product.basePrice * 5; // Maximum 5x base price
     this.maxWeeklySales = 50; // Maximum 50 units per week
     this.profitSaturation = 500000; // ₹5L total profit saturation
   }
 
-  calculateMarketResponse(newPrice, marketingBoost = 0) {
+  calculateMarketResponse(newPrice: number, marketingBoost: number = 0): number {
     const baseDemand = this.product.basePrice / newPrice;
     const priceSensitivity = 1.2;
     const marketingEffect = marketingBoost * 0.3;
-    
+
     let demand = baseDemand * this.state.marketDemand;
     demand = Math.max(0.1, Math.min(2.0, demand + marketingEffect));
-    
+
     const priceRatio = newPrice / this.product.basePrice;
     if (priceRatio > 3.0) {
       demand *= 0.3; // Heavy penalty for very high prices
@@ -333,11 +410,11 @@ class AIPricingSimulation {
     } else if (priceRatio > 1.5) {
       demand *= 0.8;
     }
-    
+
     return demand;
   }
 
-  optimizePrice(strategy) {
+  optimizePrice(strategy: Strategy): { status: string; price: number; sales: number; earnings: number; marketingCost: number; marketDemand: number; } {
     const current = this.state;
     let newPrice = current.price;
     let marketingBoost = 0;
@@ -363,8 +440,8 @@ class AIPricingSimulation {
         break;
       case 'balanced':
         const profitMargin = (current.price - this.product.materialCost) / current.price;
-        newPrice = profitMargin > 0.6 ? 
-          Math.max(this.product.materialCost * 1.3, current.price * 0.95) : 
+        newPrice = profitMargin > 0.6 ?
+          Math.max(this.product.materialCost * 1.3, current.price * 0.95) :
           Math.min(this.maxPrice, current.price * 1.1);
         status = "Balanced price adjustment...";
         break;
@@ -379,7 +456,7 @@ class AIPricingSimulation {
 
     const earningsChange = (newEarnings - current.earnings) / current.earnings;
     let newMarketDemand = current.marketDemand;
-    
+
     if (earningsChange > 0.1) {
       newMarketDemand = Math.min(2.0, newMarketDemand * 1.05);
     } else if (earningsChange < -0.1) {
@@ -419,15 +496,15 @@ class AIPricingSimulation {
     };
   }
 
-  getCurrentState() {
+  getCurrentState(): SimulationState {
     return { ...this.state };
   }
 
-  getHistory() {
+  getHistory(): HistoryEntry[] {
     return [...this.history];
   }
 
-  reset() {
+  reset(): void {
     this.state = {
       price: this.product.basePrice,
       sales: 8,
@@ -468,7 +545,7 @@ export default function GrowthWalletPage() {
     setAiStatus("Select strategy to begin optimization...");
   }, [selectedProduct]);
 
-  const handleStrategy = (strategy) => {
+  const handleStrategy = (strategy: Strategy) => {
     const result = simulation.optimizePrice(strategy);
     setAiStatus(result.status);
   };
@@ -491,9 +568,9 @@ export default function GrowthWalletPage() {
     "[10:31] AI: Market positioning for Indian handicrafts complete",
     "[10:32] Ready: Select pricing strategy to begin",
   ]);
-  const logIntervalRef = useRef(null);
+  const logIntervalRef = useRef<number | null>(null);
 
-  const strategyLogs = {
+  const strategyLogs: Record<Strategy, string> = {
     high_demand: "Premium pricing for high demand periods",
     low_demand: "Promotional pricing to stimulate demand",
     profit_max: "Maximizing profit margins strategically",
@@ -503,11 +580,11 @@ export default function GrowthWalletPage() {
 
   useEffect(() => {
     if (isAutopilotOn) {
-      const strategies = ['high_demand', 'low_demand', 'profit_max', 'balanced'];
-      logIntervalRef.current = setInterval(() => {
+      const strategies: Strategy[] = ['high_demand', 'low_demand', 'profit_max', 'balanced'];
+      logIntervalRef.current = window.setInterval(() => {
         const randomStrategy = strategies[Math.floor(Math.random() * strategies.length)];
         handleStrategy(randomStrategy);
-        
+
         const now = new Date();
         const timestamp = `[${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}]`;
         setAutopilotLog(prev => {
@@ -527,7 +604,7 @@ export default function GrowthWalletPage() {
     };
   }, [isAutopilotOn]);
 
-  const logContainerRef = useRef(null);
+  const logContainerRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     if (logContainerRef.current) {
       logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
@@ -613,9 +690,9 @@ export default function GrowthWalletPage() {
                   value={formatRupees(currentState.price)}
                   trend={parseFloat(priceTrend.toFixed(1))}
                 />
-                <DashboardStatCard 
-                  label="Weekly Sales" 
-                  value={currentState.sales}
+                <DashboardStatCard
+                  label="Weekly Sales"
+                  value={currentState.sales.toString()}
                 />
                 <DashboardStatCard 
                   label="Weekly Earnings" 
@@ -745,9 +822,9 @@ export default function GrowthWalletPage() {
                   label="Satisfaction" 
                   value={`${(currentState.customerSatisfaction * 100).toFixed(0)}%`}
                 />
-                <DashboardStatCard 
-                  label="Data Points" 
-                  value={history.length}
+                <DashboardStatCard
+                  label="Data Points"
+                  value={history.length.toString()}
                 />
               </div>
 

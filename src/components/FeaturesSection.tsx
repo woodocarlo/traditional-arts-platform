@@ -103,24 +103,32 @@ const FeaturesSection = ({ t }: { t: Translation }) => {
             </div>
           </Link>
 
-          {/* Host Workshop Card */}
-          <div className="relative group bg-gradient-to-br from-amber-900/80 to-yellow-900/80 p-6 rounded-2xl backdrop-blur-sm border border-amber-700/30 hover:border-amber-500/50 transition-all duration-300 hover:scale-105 shadow-2xl">
-            <Image
-              src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=400&auto=format&fit=crop"
-              alt="Audience at an event background"
-              fill
-              className="object-cover opacity-20 group-hover:opacity-35 transition-opacity duration-300"
-            />
-            <div className="relative z-10">
-              <VideoCameraIcon />
-              <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-amber-300 transition-colors">
-                {t.hostWorkshop}
-              </h3>
-              <p className="text-slate-300 group-hover:text-slate-200 transition-colors">
-                {t.hostWorkshopDesc}
-              </p>
+          {/* Host Workshop Card - WITH NAVIGATION */}
+          <Link href="/host-workshop" passHref>
+            <div className="relative group bg-gradient-to-br from-amber-900/80 to-yellow-900/80 p-6 rounded-2xl backdrop-blur-sm border border-amber-700/30 hover:border-amber-500/50 transition-all duration-300 hover:scale-105 shadow-2xl cursor-pointer">
+              <Image
+                src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=400&auto=format&fit=crop"
+                alt="Audience at an event background"
+                fill
+                className="object-cover opacity-20 group-hover:opacity-35 transition-opacity duration-300"
+              />
+              <div className="relative z-10">
+                <VideoCameraIcon />
+                <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-amber-300 transition-colors">
+                  {t.hostWorkshop}
+                </h3>
+                <p className="text-slate-300 group-hover:text-slate-200 transition-colors">
+                  {t.hostWorkshopDesc}
+                </p>
+                <div className="mt-4 flex items-center text-amber-400">
+                  <span className="text-sm font-medium">Host Workshop</span>
+                  <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </div>
             </div>
-          </div>
+          </Link>
         </div>
       </div>
     </section>

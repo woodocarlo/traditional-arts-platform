@@ -6,7 +6,7 @@ import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter.js";
 
 // Helper function to load a script dynamically
 const loadScript = (src: string) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     if (document.querySelector(`script[src="${src}"]`)) {
       resolve(true);
       return;
@@ -15,7 +15,9 @@ const loadScript = (src: string) => {
     script.src = src;
     script.type = "module";
     script.onload = () => resolve(true);
-    script.onerror = () => reject(new Error(`Failed to load script ${src}`));
+    script.onerror = () => {
+      throw new Error(`Failed to load script ${src}`);
+    };
     document.head.appendChild(script);
   });
 };

@@ -1,17 +1,17 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 // Added Rect for shapes, Line for drawing
 import { Stage, Layer, Image as KonvaImage, Text, Transformer, Rect as KonvaRect, Line as KonvaLine } from 'react-konva';
-import Konva from 'konva/lib/Core';
 import {
   Upload, Type, Palette, Sparkles, Trash2, X,
   Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight,
   BringToFront, SendToBack, Square as ShapeIcon, Minus, PenTool, Blend, RotateCcw,
-  BoxSelect, Droplet as BlurIcon, Focus, MinusSquare, Zap, Frame,
-  GripVertical, Crop, Image as ImageIcon, ImagePlay, PictureInPicture, ArrowLeft,
+  BoxSelect, Droplet as BlurIcon, MinusSquare, Zap, Frame,
+  GripVertical, Image as ImageIcon, ImagePlay, PictureInPicture, ArrowLeft,
   Paintbrush, Eraser, Copy, Wand2, Loader2 // Added icons
 } from 'lucide-react';
+// Removed: 'Image' from 'next/image' is not used
 
 import stockAssets from '../post_generation/stock.json' assert { type: 'json' };
 
@@ -25,6 +25,12 @@ import { Blur } from 'konva/lib/filters/Blur';
 import { Emboss } from 'konva/lib/filters/Emboss';
 import { Posterize } from 'konva/lib/filters/Posterize';
 // --- End Konva filter imports ---
+
+// --- ADDED: Konva Type Imports ---
+import type Konva from 'konva';
+import type { KonvaEventObject, Filter } from 'konva/lib/Node'; // <-- THIS IS THE FIX
+// --- End Konva Type Imports ---
+
 
 // --- Custom useImage Hook ---
 const useImage = (url: string, crossOrigin?: string) => {
@@ -203,10 +209,10 @@ const AccordionSection = ({ title, children, icon: Icon, isOpen, onToggle }: {
 
 
 // --- Konva Components (No style changes needed here) ---
-const ImageObject = ({ shapeProps, isSelected, onSelect, onChange }: { shapeProps: any, isSelected: boolean, onSelect: () => void, onChange: (props: any) => void }) => {
+const ImageObject = ({ shapeProps, isSelected, onSelect, onChange }: { shapeProps: ImageProps, isSelected: boolean, onSelect: () => void, onChange: (props: Partial<ImageProps>) => void }) => {
   const [image] = useImage(shapeProps.src, 'anonymous');
-  const shapeRef = useRef<any>(null);
-  const trRef = useRef<any>(null);
+  const shapeRef = useRef<Konva.Image>(null);
+  const trRef = useRef<Konva.Transformer>(null);
 
   useEffect(() => {
     if (isSelected && trRef.current && shapeRef.current) {
@@ -222,7 +228,7 @@ const ImageObject = ({ shapeProps, isSelected, onSelect, onChange }: { shapeProp
     }
   }, [shapeProps, image, isSelected]);
 
-  const filters: any[] = [];
+  const filters: Filter[] = [];
   filters.push(Brighten);
   filters.push(Contrast);
   if (shapeProps.grayscale) filters.push(Grayscale);
@@ -242,7 +248,7 @@ const ImageObject = ({ shapeProps, isSelected, onSelect, onChange }: { shapeProp
         image={image}
         draggable
         onDragEnd={(e) => {
-          onChange({ ...shapeProps, x: e.target.x(), y: e.target.y() });
+          onChange({ x: e.target.x(), y: e.target.y() });
         }}
         onTransformEnd={() => {
           const node = shapeRef.current;
@@ -251,7 +257,6 @@ const ImageObject = ({ shapeProps, isSelected, onSelect, onChange }: { shapeProp
             const scaleY = node.scaleY();
             node.scaleX(1); node.scaleY(1);
             onChange({
-              ...shapeProps,
               x: node.x(), y: node.y(),
               width: Math.max(5, node.width() * scaleX),
               height: Math.max(5, node.height() * scaleY),
@@ -274,9 +279,9 @@ const ImageObject = ({ shapeProps, isSelected, onSelect, onChange }: { shapeProp
   );
 };
 
-const TextObject = ({ shapeProps, isSelected, onSelect, onChange }: { shapeProps: any, isSelected: boolean, onSelect: () => void, onChange: (props: any) => void }) => {
-  const shapeRef = useRef<any>(null);
-  const trRef = useRef<any>(null);
+const TextObject = ({ shapeProps, isSelected, onSelect, onChange }: { shapeProps: TextProps, isSelected: boolean, onSelect: () => void, onChange: (props: Partial<TextProps>) => void }) => {
+  const shapeRef = useRef<Konva.Text>(null);
+  const trRef = useRef<Konva.Transformer>(null);
 
   useEffect(() => {
     if (isSelected && trRef.current && shapeRef.current) {
@@ -296,7 +301,7 @@ const TextObject = ({ shapeProps, isSelected, onSelect, onChange }: { shapeProps
       <Text
         onClick={onSelect} onTap={onSelect} ref={shapeRef} {...shapeProps}
         fontStyle={fontStyle} textDecoration={textDecoration} draggable
-        onDragEnd={(e) => onChange({ ...shapeProps, x: e.target.x(), y: e.target.y() })}
+        onDragEnd={(e) => onChange({ x: e.target.x(), y: e.target.y() })}
         onTransformEnd={() => {
           const node = shapeRef.current;
           if (node) {
@@ -304,7 +309,7 @@ const TextObject = ({ shapeProps, isSelected, onSelect, onChange }: { shapeProps
             node.scaleX(1); node.scaleY(1);
             onChange({
               ...shapeProps, x: node.x(), y: node.y(),
-              fontSize: Math.max(5, (node.fontSize() || 12) * scaleY),
+              fontSize: Math.max(5, (node.fontSize || 12) * scaleY),
               width: Math.max(5, node.width() * scaleX),
               height: Math.max(5, node.height() * scaleY),
               rotation: node.rotation(),
@@ -317,9 +322,9 @@ const TextObject = ({ shapeProps, isSelected, onSelect, onChange }: { shapeProps
   );
 };
 
-const ShapeObject = ({ shapeProps, isSelected, onSelect, onChange }: { shapeProps: any, isSelected: boolean, onSelect: () => void, onChange: (props: any) => void }) => {
-  const shapeRef = useRef<any>(null);
-  const trRef = useRef<any>(null);
+const ShapeObject = ({ shapeProps, isSelected, onSelect, onChange }: { shapeProps: ShapeProps, isSelected: boolean, onSelect: () => void, onChange: (props: Partial<ShapeProps>) => void }) => {
+  const shapeRef = useRef<Konva.Rect>(null);
+  const trRef = useRef<Konva.Transformer>(null);
 
   useEffect(() => {
     if (isSelected && trRef.current && shapeRef.current) {
@@ -332,7 +337,7 @@ const ShapeObject = ({ shapeProps, isSelected, onSelect, onChange }: { shapeProp
     <>
       <KonvaRect
         onClick={onSelect} onTap={onSelect} ref={shapeRef} {...shapeProps} draggable
-        onDragEnd={(e) => onChange({ ...shapeProps, x: e.target.x(), y: e.target.y() })}
+        onDragEnd={(e) => onChange({ x: e.target.x(), y: e.target.y() })}
         onTransformEnd={() => {
           const node = shapeRef.current;
           if (node) {
@@ -370,14 +375,91 @@ interface LineData {
   globalCompositeOperation?: string;
 }
 
+// --- ADDED: Type Definitions ---
+interface BaseObject {
+  id: string;
+  type: 'image' | 'text' | 'shape' | 'line';
+  x: number;
+  y: number;
+  width?: number; // Not for line
+  height?: number; // Not for line
+  rotation?: number; // Not for line
+  opacity: number;
+  shadowColor: string;
+  shadowBlur: number;
+  shadowOffsetX: number;
+  shadowOffsetY: number;
+  shadowOpacity: number;
+}
+
+interface ImageProps extends BaseObject {
+  type: 'image';
+  src: string;
+  width: number;
+  height: number;
+  rotation: number;
+  brightness: number;
+  contrast: number;
+  grayscale: boolean;
+  sepia: boolean;
+  invert: boolean;
+  blur: number;
+  emboss: boolean;
+  posterize: number;
+  stroke: string;
+  strokeWidth: number;
+  naturalWidth: number;
+  naturalHeight: number;
+  cropX: number;
+  cropY: number;
+  cropWidth: number;
+  cropHeight: number;
+}
+
+interface TextProps extends BaseObject {
+  type: 'text';
+  text: string;
+  fontSize: number;
+  fontFamily: string;
+  fill: string;
+  width: number;
+  height: number; // Konva text can have height
+  rotation: number;
+  isBold: boolean;
+  isItalic: boolean;
+  isUnderlined: boolean;
+  isStrikethrough: boolean;
+  align: string;
+  lineHeight: number;
+  letterSpacing: number;
+  stroke: string;
+  strokeWidth: number;
+}
+
+interface ShapeProps extends BaseObject {
+  type: 'shape';
+  shapeType: 'rect'; // Only 'rect' is used
+  width: number;
+  height: number;
+  rotation: number;
+  fill: string;
+  stroke: string;
+  strokeWidth: number;
+}
+
+// A union type for all objects
+type CanvasObject = ImageProps | TextProps | ShapeProps | LineData;
+// --- End Type Definitions ---
+
+
 const INITIAL_ASSET_COUNT = 6; // Number of assets to show initially
 const LOAD_MORE_COUNT = 6;     // Number of assets to load each time
 
 export default function CreateYourOwnPost() {
-  const [objects, setObjects] = useState<any[]>([]);
+  const [objects, setObjects] = useState<CanvasObject[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const stageRef = useRef<any>(null);
+  const stageRef = useRef<Konva.Stage>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mainCanvasContainerRef = useRef<HTMLElement>(null);
 
@@ -451,7 +533,7 @@ export default function CreateYourOwnPost() {
         const img = new window.Image();
         img.onload = () => {
           const scale = Math.min(stageSize.width * 0.5 / img.width, stageSize.height * 0.5 / img.height, 1);
-          const newObject = {
+          const newObject: ImageProps = {
             id: `image-${Date.now()}`, type: 'image', src,
             x: (stageSize.width - img.width * scale) / 2, y: (stageSize.height - img.height * scale) / 2,
             width: img.width * scale, height: img.height * scale, rotation: 0, opacity: 1,
@@ -476,7 +558,7 @@ export default function CreateYourOwnPost() {
     img.crossOrigin = 'anonymous'; img.src = url;
     img.onload = () => {
       const scale = Math.min(stageSize.width / img.naturalWidth, stageSize.height / img.naturalHeight, 1);
-      const newObject = {
+      const newObject: ImageProps = {
         id: `image-${Date.now()}`, type: 'image', src: url,
         x: (stageSize.width - img.naturalWidth * scale) / 2, y: (stageSize.height - img.naturalHeight * scale) / 2,
         width: img.naturalWidth * scale, height: img.naturalHeight * scale, rotation: 0, opacity: 1,
@@ -495,12 +577,12 @@ export default function CreateYourOwnPost() {
 
   const addText = () => {
     disableDrawing();
-    const newObject = {
+    const newObject: TextProps = {
       id: `text-${Date.now()}`, type: 'text', text: 'Type here',
       x: stageSize.width / 2 - 100, y: stageSize.height / 2 - 20, fontSize: 40, fontFamily: 'Roboto',
-      // --- MODIFIED: Default text fill color ---
       fill: '#000000', // Changed to Black
-      rotation: 0, opacity: 1, width: 200, isBold: false, isItalic: false,
+      rotation: 0, opacity: 1, width: 200, height: 50, // Added default height
+      isBold: false, isItalic: false,
       isUnderlined: false, isStrikethrough: false, align: 'left', lineHeight: 1.2, letterSpacing: 0,
       stroke: '#000000', strokeWidth: 0, shadowColor: '#000000', shadowBlur: 0,
       shadowOffsetX: 0, shadowOffsetY: 0, shadowOpacity: 0,
@@ -510,7 +592,7 @@ export default function CreateYourOwnPost() {
   
   const addShape = () => {
     disableDrawing(); 
-    const newObject = {
+    const newObject: ShapeProps = {
       id: `shape-${Date.now()}`, type: 'shape', shapeType: 'rect', 
       x: stageSize.width / 2 - 50, y: stageSize.height / 2 - 50,
       width: 100, height: 100, fill: '#805AD5', // Default purple fill
@@ -520,11 +602,11 @@ export default function CreateYourOwnPost() {
     setObjects(prev => [...prev, newObject]); setSelectedId(newObject.id);
   };
 
-  const updateObject = (id: string, newProps: any) => {
+  const updateObject = (id: string, newProps: Partial<CanvasObject>) => {
     setObjects(prev => prev.map(obj => (obj.id === id ? { ...obj, ...newProps } : obj)));
   };
 
-  const checkDeselect = (e: any) => {
+  const checkDeselect = (e: KonvaEventObject) => {
      if (isDrawingMode) return; 
     const clickedOnEmpty = e.target === e.target.getStage();
     if (clickedOnEmpty) setSelectedId(null);
@@ -568,17 +650,17 @@ export default function CreateYourOwnPost() {
   };
   
   // --- Drawing Event Handlers ---
-  const handleMouseDown = (e: any) => {
+  const handleMouseDown = (e: KonvaEventObject) => {
      if (!isDrawingMode || selectedId || e.target !== e.target.getStage()) {
-      checkDeselect(e); return;
+       checkDeselect(e); return;
     }
     setIsDrawing(true); const pos = e.target.getStage().getPointerPosition();
-    setCurrentLinePoints([pos.x, pos.y]); 
+    if (pos) setCurrentLinePoints([pos.x, pos.y]); 
   };
-  const handleMouseMove = (e: any) => {
+  const handleMouseMove = (e: KonvaEventObject) => {
     if (!isDrawing || !isDrawingMode) return;
     const stage = e.target.getStage(); const point = stage.getPointerPosition();
-    setCurrentLinePoints(prevPoints => [...prevPoints, point.x, point.y]); 
+    if (point) setCurrentLinePoints(prevPoints => [...prevPoints, point.x, point.y]); 
   };
   const handleMouseUp = () => {
     if (!isDrawing || !isDrawingMode) return;
@@ -640,6 +722,12 @@ export default function CreateYourOwnPost() {
       );
     }
     
+    // --- Type Guards for Selected Object ---
+    const isImage = (obj: CanvasObject): obj is ImageProps => obj.type === 'image';
+    const isText = (obj: CanvasObject): obj is TextProps => obj.type === 'text';
+    const isShape = (obj: CanvasObject): obj is ShapeProps => obj.type === 'shape';
+    // --- End Type Guards ---
+
     // Selected Object Settings Panel
     return (
       <div className="p-4 h-full flex flex-col">
@@ -649,7 +737,7 @@ export default function CreateYourOwnPost() {
           {selectedObject.type !== 'line' && ( // Lines don't have transform options here
             <AccordionSection title="Transform" icon={GripVertical} isOpen={openAccordion === 'Transform'} onToggle={() => handleAccordionToggle('Transform')}>
               <SliderControl label="Opacity" min={0} max={1} step={0.01} value={selectedObject.opacity} onChange={(e) => updateObject(selectedId!, { opacity: parseFloat(e.target.value) })}/>
-              <SliderControl label="Rotation" min={-180} max={180} step={1} value={selectedObject.rotation} onChange={(e) => updateObject(selectedId!, { rotation: parseFloat(e.target.value) })}/>
+              <SliderControl label="Rotation" min={-180} max={180} step={1} value={selectedObject.rotation || 0} onChange={(e) => updateObject(selectedId!, { rotation: parseFloat(e.target.value) })}/>
               <div className="flex justify-around gap-2 mt-3">
                 <IconButton icon={BringToFront} onClick={() => moveObject('forward')} title="Bring Forward" />
                 <IconButton icon={SendToBack} onClick={() => moveObject('backward')} title="Send Backward" />
@@ -659,7 +747,7 @@ export default function CreateYourOwnPost() {
           )}
 
           {/* Image Sections */}
-          {selectedObject.type === 'image' && (
+          {isImage(selectedObject) && (
             <>
               <AccordionSection title="Adjustments" icon={Sparkles} isOpen={openAccordion === 'Adjustments'} onToggle={() => handleAccordionToggle('Adjustments')}>
                 <SliderControl label="Brightness" min={-1} max={1} step={0.01} value={selectedObject.brightness} onChange={(e) => updateObject(selectedId!, { brightness: parseFloat(e.target.value) })}/>
@@ -679,7 +767,7 @@ export default function CreateYourOwnPost() {
           )}
 
           {/* Text Sections */}
-          {selectedObject.type === 'text' && (
+          {isText(selectedObject) && (
             <>
               <AccordionSection title="Content & Font" icon={Type} isOpen={openAccordion === 'Content & Font'} onToggle={() => handleAccordionToggle('Content & Font')}>
                 <div> <label className="text-xs text-gray-400 block mb-1">Text Content</label> <textarea value={selectedObject.text} onChange={(e) => updateObject(selectedId!, { text: e.target.value })} className="w-full h-24 px-3 py-2 bg-black/30 border border-white/20 rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-400 resize-none" rows={3}/> </div>
@@ -706,14 +794,14 @@ export default function CreateYourOwnPost() {
           )}
           
           {/* Shape Section */}
-          {selectedObject.type === 'shape' && (
+          {isShape(selectedObject) && (
              <AccordionSection title="Color" icon={Palette} isOpen={openAccordion === 'Color'} onToggle={() => handleAccordionToggle('Color')}>
                  <ColorInput label="Fill Color" value={selectedObject.fill} onChange={(e) => updateObject(selectedId!, { fill: e.target.value })}/>
              </AccordionSection>
           )}
 
           {/* Outline Section (Text & Shape) */}
-          {(selectedObject.type === 'text' || selectedObject.type === 'shape') && (
+            {(isText(selectedObject) || isShape(selectedObject)) && (
             <AccordionSection title="Outline" icon={PenTool} isOpen={openAccordion === 'Outline'} onToggle={() => handleAccordionToggle('Outline')}>
               <ColorInput label="Outline Color" value={selectedObject.stroke} onChange={(e) => updateObject(selectedId!, { stroke: e.target.value })}/>
               <SliderControl label="Outline Width" min={0} max={20} step={1} value={selectedObject.strokeWidth} onChange={(e) => updateObject(selectedId!, { strokeWidth: parseFloat(e.target.value) })}/>
@@ -724,7 +812,7 @@ export default function CreateYourOwnPost() {
           {selectedObject.type !== 'line' && (
             <AccordionSection title="Shadow" icon={Frame} isOpen={openAccordion === 'Shadow'} onToggle={() => handleAccordionToggle('Shadow')}>
               <ColorInput label="Shadow Color" value={selectedObject.shadowColor} onChange={(e) => updateObject(selectedId!, { shadowColor: e.target.value })}/>
-              <SliderControl label="Shadow Blur" min={0} max={50} step={1} value={selectedObject.shadowBlur} onChange={(e) => updateObject(selectedId!, { shadowBlur: parseFloat(e.target.value) })}/>
+              <SliderControl label="Shadow Blur" min={0} max={550} step={1} value={selectedObject.shadowBlur} onChange={(e) => updateObject(selectedId!, { shadowBlur: parseFloat(e.target.value) })}/>
               <SliderControl label="Shadow Offset X" min={-50} max={50} step={1} value={selectedObject.shadowOffsetX} onChange={(e) => updateObject(selectedId!, { shadowOffsetX: parseFloat(e.target.value) })}/>
               <SliderControl label="Shadow Offset Y" min={-50} max={50} step={1} value={selectedObject.shadowOffsetY} onChange={(e) => updateObject(selectedId!, { shadowOffsetY: parseFloat(e.target.value) })}/>
               <SliderControl label="Shadow Opacity" min={0} max={1} step={0.01} value={selectedObject.shadowOpacity} onChange={(e) => updateObject(selectedId!, { shadowOpacity: parseFloat(e.target.value) })}/>
@@ -734,12 +822,12 @@ export default function CreateYourOwnPost() {
         
         {/* Delete Button (Only if not a line) */}
          {selectedObject.type !== 'line' && (
-            <div className="mt-auto pt-3">
-              <button onClick={() => { setObjects(prev => prev.filter(obj => obj.id !== selectedId)); setSelectedId(null); }}
-                className="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
-                <Trash2 size={16} /> Delete Object
-              </button>
-            </div>
+           <div className="mt-auto pt-3">
+             <button onClick={() => { setObjects(prev => prev.filter(obj => obj.id !== selectedId)); setSelectedId(null); }}
+               className="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
+               <Trash2 size={16} /> Delete Object
+             </button>
+           </div>
          )}
       </div>
     );
@@ -790,7 +878,8 @@ export default function CreateYourOwnPost() {
           {/* --- MODIFIED: Grid cols-2 --- */}
           <div className="grid grid-cols-2 gap-2">
             {assetsToShow.map(item => (
-               <img key={item.id} src={item.url} crossOrigin="Anonymous" alt={item.id}
+              // eslint-disable-next-line @next/next/no-img-element
+                <img key={item.id} src={item.url} crossOrigin="anonymous" alt={item.id}
                   className="w-full h-auto object-cover rounded-md cursor-pointer hover:opacity-80 transition-opacity aspect-square" // Added aspect-square
                   onClick={() => addStockImage(item.url, activeLeftPanel)}
                   onError={(e) => (e.currentTarget.src = 'https://placehold.co/100x100/1A202C/4A5568?text=Error')}/>
@@ -799,15 +888,15 @@ export default function CreateYourOwnPost() {
           {/* --- Load More Button --- */}
           {hasMoreAssets && (
              <button
-               onClick={handleLoadMore}
-               disabled={isLoadingMoreAssets}
-               className="w-full mt-4 bg-white/10 hover:bg-white/20 text-gray-200 py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-wait"
-             >
-               {isLoadingMoreAssets ? (
-                 <> <Loader2 size={16} className="animate-spin"/> Loading... </>
-               ) : (
-                 'Load More'
-               )}
+                onClick={handleLoadMore}
+                disabled={isLoadingMoreAssets}
+                className="w-full mt-4 bg-white/10 hover:bg-white/20 text-gray-200 py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-wait"
+              >
+                {isLoadingMoreAssets ? (
+                  <> <Loader2 size={16} className="animate-spin"/> Loading... </>
+                ) : (
+                  'Load More'
+                )}
             </button>
           )}
         </div>
@@ -819,18 +908,18 @@ export default function CreateYourOwnPost() {
     const handleGenerate = () => console.log("Generate AI Image with prompt:", aiPrompt);
     return (
        <div className="flex flex-col h-full">
-        <div className="flex items-center mb-4 flex-shrink-0">
-          <button onClick={() => setActiveLeftPanel('tools')} className="p-2 text-gray-300 hover:text-white" title="Back to tools"> <ArrowLeft size={20} /> </button>
-          <h4 className="text-white text-sm font-semibold mx-auto pr-8">AI Image Generation</h4>
-        </div>
-        <div className="flex-1 overflow-y-auto pr-2 space-y-4">
-           <textarea value={aiPrompt} onChange={(e) => setAiPrompt(e.target.value)} placeholder="Enter your image prompt..."
+         <div className="flex items-center mb-4 flex-shrink-0">
+           <button onClick={() => setActiveLeftPanel('tools')} className="p-2 text-gray-300 hover:text-white" title="Back to tools"> <ArrowLeft size={20} /> </button>
+           <h4 className="text-white text-sm font-semibold mx-auto pr-8">AI Image Generation</h4>
+         </div>
+         <div className="flex-1 overflow-y-auto pr-2 space-y-4">
+            <textarea value={aiPrompt} onChange={(e) => setAiPrompt(e.target.value)} placeholder="Enter your image prompt..."
               className="w-full h-40 px-3 py-2 bg-black/30 border border-white/20 rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-400 resize-none"/>
              <button onClick={handleGenerate} className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
-              Generate Image
-            </button>
-        </div>
-      </div>
+               Generate Image
+             </button>
+         </div>
+       </div>
     );
   };
 
@@ -851,11 +940,11 @@ export default function CreateYourOwnPost() {
             <h1 className="text-2xl font-bold text-white">My Canva</h1>
             <div className="flex gap-4">
                <button onClick={handlePost} className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-2 rounded-lg font-medium transition-colors shadow-lg">
-                  Post
-                </button>
-                <button onClick={downloadImage} className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-2 rounded-lg font-medium transition-colors shadow-lg">
-                  Download
-                </button>
+                 Post
+               </button>
+               <button onClick={downloadImage} className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-2 rounded-lg font-medium transition-colors shadow-lg">
+                 Download
+               </button>
              </div>
           </header>
 
@@ -909,24 +998,24 @@ export default function CreateYourOwnPost() {
                       backgroundColor: canvasBackgroundColor,
                       // --- MODIFIED CURSOR LOGIC ---
                       cursor: isDrawingMode
-                        ? drawingTool === 'eraser'
-                          ? 'cell' // Or 'grab', 'grabbing', 'crosshair' - 'cell' gives a boxy feel
-                          : 'crosshair' // Cursor for the pen tool
-                        : 'default' // Default cursor when not drawing
+                       ? drawingTool === 'eraser'
+                         ? 'cell' // Or 'grab', 'grabbing', 'crosshair' - 'cell' gives a boxy feel
+                         : 'crosshair' // Cursor for the pen tool
+                       : 'default' // Default cursor when not drawing
                     }}
-                  >
+                >
                   <Layer>
                     {objects.map((obj) => {
                       const commonProps = {
-                        shapeProps: obj, isSelected: obj.id === selectedId,
+                        isSelected: obj.id === selectedId,
                         onSelect: () => !isDrawingMode && setSelectedId(obj.id),
-                        onChange: (newAttrs: any) => updateObject(obj.id, newAttrs),
+                        onChange: (newAttrs: Partial<CanvasObject>) => updateObject(obj.id, newAttrs),
                       };
-                      if (obj.type === 'image') return <ImageObject key={obj.id} {...commonProps} />;
-                      if (obj.type === 'text') return <TextObject key={obj.id} {...commonProps} />;
-                      if (obj.type === 'shape') return <ShapeObject key={obj.id} {...commonProps} />;
-                      if (obj.type === 'line') return <KonvaLine key={obj.id} points={obj.points} stroke={obj.stroke} strokeWidth={obj.strokeWidth} tension={obj.tension} lineCap={obj.lineCap} globalCompositeOperation={obj.globalCompositeOperation}/>;
-                      return null;
+                        if (obj.type === 'image') return <ImageObject key={obj.id} {...commonProps} shapeProps={obj} />;
+                        if (obj.type === 'text') return <TextObject key={obj.id} {...commonProps} shapeProps={obj} />;
+                        if (obj.type === 'shape') return <ShapeObject key={obj.id} {...commonProps} shapeProps={obj} />;
+                        if (obj.type === 'line') return <KonvaLine key={obj.id} points={obj.points} stroke={obj.stroke} strokeWidth={obj.strokeWidth} tension={obj.tension} lineCap={obj.lineCap} globalCompositeOperation={obj.globalCompositeOperation}/>;
+                        return null;
                     })}
                     {isDrawing && <KonvaLine points={currentLinePoints} stroke={drawingTool === 'eraser' ? '#FFFFFF' : brushColor} strokeWidth={brushSize} tension={0.5} lineCap="round" globalCompositeOperation={drawingTool === 'eraser' ? 'destination-out' : 'source-over'}/>}
                   </Layer>

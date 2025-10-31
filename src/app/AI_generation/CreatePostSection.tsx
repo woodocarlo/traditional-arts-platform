@@ -99,6 +99,8 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
   const [isEditingScript, setIsEditingScript] = useState<boolean>(false);
   const [isFaceModalOpen, setIsFaceModalOpen] = useState<boolean>(false);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+  const [faceVideoPath, setFaceVideoPath] = useState<string | null>(null);
+  const [lipSyncVideoUrl, setLipSyncVideoUrl] = useState<string | null>(null);
 
   const stopCameraStream = () => {
     if (cameraStream) {
@@ -225,10 +227,18 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
       
       setCurrentStep(2);
       await generateAndPlayAudio(script);
-      
-      setCurrentStep(3);
+
+      // Generate lip sync video if face video is uploaded and type is 'face'
+      if (podcastConfig.type === 'face' && faceVideoPath) {
+        setCurrentStep(3);
+        await generateLipSyncVideo(script, faceVideoPath);
+      } else {
+        setCurrentStep(3);
+      }
+
+      setCurrentStep(4);
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
+
       setIsProcessing(false);
       setActiveTab('preview');
       
@@ -275,19 +285,19 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
         },
         body: JSON.stringify({ script, language }),
       });
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`API failed: ${response.status} ${response.statusText} - ${errorText}`);
       }
-      
+
       const audioBlob = await response.blob();
       console.log("📥 Received audio blob:", audioBlob.size, "bytes", audioBlob.type);
-      
+
       if (audioBlob.size === 0) {
         throw new Error("Received empty audio data");
       }
-      
+
       const base64Audio = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -296,7 +306,7 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
         reader.onerror = reject;
         reader.readAsDataURL(audioBlob);
       });
-      
+
       setAudioUrl(base64Audio);
       console.log("✅ Base64 audio URL set");
     } catch (error: unknown) {
@@ -310,10 +320,65 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
     }
   };
 
+  const generateLipSyncVideo = async (script: string, faceVideoPath: string) => {
+    try {
+      console.log("🎯 Generating lip sync video...");
+
+      // Extract audio data from the current audioUrl (base64)
+      if (!audioUrl) {
+        throw new Error("No audio data available for lip sync");
+      }
+
+      // Remove the data URL prefix if present (e.g., "data:audio/wav;base64,")
+      const audioData = audioUrl.replace(/^data:audio\/[^;]+;base64,/, '');
+
+      // Determine speaker based on the first speaker in the script
+      const lines = script.split('\n').filter(line => line.trim() && line.includes(':'));
+      let speaker = 'anushka'; // default
+      if (lines.length > 0) {
+        const firstLine = lines[0].trim();
+        const speakerPart = firstLine.split(':')[0].trim().replace(/[\*\_\[\]\(\)]/g, '').toLowerCase();
+        if (speakerPart === 'priya') speaker = 'anushka';
+        else if (speakerPart === 'arjun') speaker = 'abhilash';
+      }
+
+      const response = await fetch("/api/podcast/generate-lip-sync", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          faceVideoPath,
+          audioData,
+          speaker
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Lip sync API failed: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+
+      const { videoData } = await response.json();
+      const videoUrl = `data:video/mp4;base64,${videoData}`;
+      setLipSyncVideoUrl(videoUrl);
+      console.log("✅ Lip sync video URL set");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("❌ Error generating lip sync video:", error);
+        alert(`Lip sync generation failed: ${error.message}`);
+      } else {
+        console.error("❌ Unknown error generating lip sync video:", error);
+        alert("Lip sync generation failed due to an unknown error.");
+      }
+    }
+  };
+
   const steps = [
     'Generating script...',
     'Saving podcast...',
     'Generating audio...',
+    'Creating lip sync...',
     'Polishing final touches...'
   ];
 
@@ -416,9 +481,11 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
               <label className="text-white font-medium">Face Video</label>
               <button
                 onClick={() => setIsFaceModalOpen(true)}
-                className="w-full p-3 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-medium transition-colors"
+                className={`w-full p-3 rounded-lg text-white font-medium transition-colors ${
+                  faceVideoPath ? 'bg-green-600 hover:bg-green-700' : 'bg-purple-600 hover:bg-purple-700'
+                }`}
               >
-                Upload Face Video
+                {faceVideoPath ? 'Face Video Uploaded ✓' : 'Upload Face Video'}
               </button>
             </div>
           )}
@@ -572,10 +639,15 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
           </div>
         </div>
       )}
-      {isFaceModalOpen && <FaceUploadModal onClose={() => {
-        setIsFaceModalOpen(false);
-        forceStopCamera();
-      }} />}
+      {isFaceModalOpen && <FaceUploadModal
+        onClose={() => {
+          setIsFaceModalOpen(false);
+          forceStopCamera();
+        }}
+        onUploadSuccess={(tempFilePath) => {
+          setFaceVideoPath(tempFilePath);
+        }}
+      />}
     </div>
   );
 
@@ -644,6 +716,21 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
               </div>
             )}
           </div>
+          {lipSyncVideoUrl && (
+            <div className="mt-4 space-y-2">
+              <h6 className="text-white font-medium">Lip Sync Video:</h6>
+              <div className="mt-4">
+                <video
+                  controls
+                  src={lipSyncVideoUrl}
+                  onError={(e) => console.error('Video element error:', e.currentTarget.error)}
+                  className="w-full rounded-lg"
+                >
+                  Your browser does not support the video element.
+                </video>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     ) : null

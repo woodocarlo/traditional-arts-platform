@@ -8,7 +8,7 @@ const CloseIcon = () => (
   </svg>
 );
 
-const FaceUploadModal = ({ onClose }: { onClose: () => void }) => {
+const FaceUploadModal = ({ onClose, onUploadSuccess }: { onClose: () => void; onUploadSuccess?: (tempFilePath: string) => void }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const currentStreamRef = useRef<MediaStream | null>(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -166,11 +166,39 @@ const FaceUploadModal = ({ onClose }: { onClose: () => void }) => {
     onClose();
   };
 
-  const handleUploadVideo = () => {
+  const handleUploadVideo = async () => {
     if (recordedChunks.length > 0) {
       const blob = new Blob(recordedChunks, { type: "video/webm" });
-      // Here you would typically upload the blob to a server
-      console.log("Uploading video:", blob);
+
+      try {
+        const formData = new FormData();
+        formData.append('video', blob, 'face-video.webm');
+
+        const response = await fetch('/api/upload-face-video', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          console.log("Video uploaded successfully:", result);
+
+          // Call the success callback with the temp file path
+          if (onUploadSuccess && result.tempFilePath) {
+            onUploadSuccess(result.tempFilePath);
+          }
+
+          alert("Face video uploaded successfully!");
+        } else {
+          const error = await response.json();
+          console.error("Upload failed:", error);
+          alert(`Upload failed: ${error.error}`);
+        }
+      } catch (error) {
+        console.error("Error uploading video:", error);
+        alert("Error uploading video. Please try again.");
+      }
+
       setRecordedChunks([]);
       handleClose();
     }

@@ -6,7 +6,7 @@ export async function POST(request) {
   try {
     const { script, config, timestamp } = await request.json();
     
-    const podcastsPath = 'C:\\Users\\Satish\\Desktop\\hack2skill\\genAIexchange\\frontend\\traditional-arts-platform\\public\\assets\\podcasts';
+    const podcastsPath = path.join(process.cwd(), 'public', 'assets', 'podcasts');
     
     if (!fs.existsSync(podcastsPath)) {
       fs.mkdirSync(podcastsPath, { recursive: true });

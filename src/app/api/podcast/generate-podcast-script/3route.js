@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 
 // Get your Gemini API key from Google AI Studio and add it to a .env.local file
-const GEMINI_API_KEY = "AIzaSyDZ5S69ygJDM1eJFxvV6AqCEUtl9Uqryiw";
+const GEMINI_API_KEY = "AIzaSyCoaNv8rp-UVQ3uqio5VD9dIAZQsPR5ok4";
 
 export async function POST(request) {
   // 1. Basic check for the API key
@@ -88,8 +88,9 @@ Begin the script now:`;
     console.log('🚀 Making API call to Google Gemini with model: gemini-1.5-flash-latest');
 
     // 4. The API endpoint and headers are updated for Gemini.
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`, {
+   const response = await fetch(
+      // FIX: Changed model name to a currently supported stable version (gemini-2.5-flash)
+      `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

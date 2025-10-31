@@ -1,9 +1,4 @@
-# TODO: Fix ESLint Errors in ARViewer.tsx
+# TODO: Make Host a Workshop Button Active and Create Demo Page
 
-- [ ] Remove unused 'reject' parameter from getImageDimensions Promise
-- [ ] Type img.onerror callback as (err: Event)
-- [ ] Type GLTFExporter success callback as (gltf: ArrayBuffer)
-- [ ] Type GLTFExporter error callback as (error: ErrorEvent)
-- [ ] Type model-viewer ref as (el: HTMLElement)
-- [ ] Type button onMouseOver/onMouseOut as (e: React.MouseEvent<HTMLButtonElement>)
-- [ ] Run ESLint to verify all errors are resolved
+- [x] Edit src/components/FeaturesSection.tsx to wrap the Host Workshop card in a Link component with href="/host-workshop"
+- [x] Create src/app/host-workshop/page.tsx with a demo page including title, description, and basic UI elements
