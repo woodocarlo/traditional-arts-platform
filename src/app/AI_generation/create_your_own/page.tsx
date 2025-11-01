@@ -13,7 +13,35 @@ import {
 } from 'lucide-react';
 // Removed: 'Image' from 'next/image' is not used
 
-import stockAssets from '../post_generation/stock.json' assert { type: 'json' };
+// import stockAssets from '../post_generation/stock.json' assert { type: 'json' };
+// --- MOCKED: stockAssets data to resolve build error ---
+const stockAssets = {
+  backgrounds: [
+    { id: "bg1", url: "https://placehold.co/600x600/1a202c/ffffff?text=Background+1" },
+    { id: "bg2", url: "https://placehold.co/600x600/2d3748/ffffff?text=Background+2" },
+    { id: "bg3", url: "https://placehold.co/600x600/4a5568/ffffff?text=Background+3" },
+    { id: "bg4", url: "https://placehold.co/600x600/718096/ffffff?text=Background+4" },
+    { id: "bg5", url: "https://placehold.co/600x600/a0aec0/000000?text=Background+5" },
+    { id: "bg6", url: "https://placehold.co/600x600/edf2f7/000000?text=Background+6" },
+  ],
+  centerImages: [
+    { id: "el1", url: "https://placehold.co/400x400/805ad5/ffffff?text=Element+1" },
+    { id: "el2", url: "https://placehold.co/400x400/d53f8c/ffffff?text=Element+2" },
+    { id: "el3", url: "https://placehold.co/400x400/f56565/ffffff?text=Element+3" },
+    { id: "el4", url: "https://placehold.co/400x400/ed8936/ffffff?text=Element+4" },
+    { id: "el5", url: "https://placehold.co/400x400/48bb78/ffffff?text=Element+5" },
+    { id: "el6", url: "https://placehold.co/400x400/38b2ac/ffffff?text=Element+6" },
+  ],
+  overlays: [
+    { id: "ov1", url: "https://placehold.co/600x600/ffffff/000000?text=Overlay+1&font=png&bg=transparent" },
+    { id: "ov2", url: "https://placehold.co/600x600/000000/ffffff?text=Overlay+2&font=png&bg=transparent" },
+    { id: "ov3", url: "https://placehold.co/600x600/edf2f7/000000?text=Overlay+3&font=png&bg=transparent" },
+    { id: "ov4", url: "https://placehold.co/600x600/a0aec0/000000?text=Overlay+4&font=png&bg=transparent" },
+    { id: "ov5", url: "https://placehold.co/600x600/718096/ffffff?text=Overlay+5&font=png&bg=transparent" },
+    { id: "ov6", url: "https://placehold.co/600x600/4a5568/ffffff?text=Overlay+6&font=png&bg=transparent" },
+  ]
+};
+// --- End Mock ---
 
 // --- Konva filter imports ---
 import { Brighten } from 'konva/lib/filters/Brighten';
@@ -95,7 +123,7 @@ const GoogleFontImporter = () => (
     
     /* --- Custom Select Dropdown Arrow --- */
     .custom-select {
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w2.000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
       background-position: right 0.5rem center;
       background-repeat: no-repeat;
       background-size: 1.5em 1.5em;
@@ -455,6 +483,14 @@ type CanvasObject = ImageProps | TextProps | ShapeProps | LineData;
 const INITIAL_ASSET_COUNT = 6; // Number of assets to show initially
 const LOAD_MORE_COUNT = 6;     // Number of assets to load each time
 
+// --- AI Generation Constants ---
+// NOTE: Per user request, the API key is placed here.
+// In a real application, this should be handled securely on a server
+// or via environment variables, not hardcoded in the client.
+const API_KEY = "AIzaSyAtVimUosOHmBfhINtzJcQHuOQqqDyk7FU";
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${API_KEY}`;
+const MAX_RETRIES = 3;
+
 export default function CreateYourOwnPost() {
   const [objects, setObjects] = useState<CanvasObject[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -476,7 +512,11 @@ export default function CreateYourOwnPost() {
   const [brushColor, setBrushColor] = useState('#000000');
   const [brushSize, setBrushSize] = useState(5);
   const [currentLinePoints, setCurrentLinePoints] = useState<number[]>([]);
+  
+  // AI Generation states
   const [aiPrompt, setAiPrompt] = useState(''); 
+  const [isGenerating, setIsGenerating] = useState(false); // <-- ADDED for loading
+  const [aiError, setAiError] = useState<string | null>(null); // <-- ADDED for errors
 
   const [canvasBackgroundColor, setCanvasBackgroundColor] = useState('#FFFFFF'); // Dark Gray
 
@@ -530,22 +570,7 @@ export default function CreateYourOwnPost() {
       const reader = new FileReader();
       reader.onload = (e) => {
         const src = e.target?.result as string;
-        const img = new window.Image();
-        img.onload = () => {
-          const scale = Math.min(stageSize.width * 0.5 / img.width, stageSize.height * 0.5 / img.height, 1);
-          const newObject: ImageProps = {
-            id: `image-${Date.now()}`, type: 'image', src,
-            x: (stageSize.width - img.width * scale) / 2, y: (stageSize.height - img.height * scale) / 2,
-            width: img.width * scale, height: img.height * scale, rotation: 0, opacity: 1,
-            brightness: 0, contrast: 0, grayscale: false, sepia: false, invert: false, blur: 0,
-            emboss: false, posterize: 0, stroke: '#000000', strokeWidth: 0,
-            shadowColor: '#000000', shadowBlur: 0, shadowOffsetX: 0, shadowOffsetY: 0, shadowOpacity: 0,
-            naturalWidth: img.naturalWidth, naturalHeight: img.naturalHeight,
-            cropX: 0, cropY: 0, cropWidth: img.naturalWidth, cropHeight: img.naturalHeight,
-          };
-          setObjects(prev => [...prev, newObject]); setSelectedId(newObject.id);
-        };
-        img.src = src;
+        addAiImage(src); // Reuse AI image adding logic
       };
       reader.readAsDataURL(file);
     }
@@ -555,7 +580,8 @@ export default function CreateYourOwnPost() {
   const addStockImage = (url: string, type: ActiveLeftPanel) => {
     disableDrawing();
     const img = new window.Image();
-    img.crossOrigin = 'anonymous'; img.src = url;
+    img.crossOrigin = 'anonymous'; 
+    img.src = url;
     img.onload = () => {
       const scale = Math.min(stageSize.width / img.naturalWidth, stageSize.height / img.naturalHeight, 1);
       const newObject: ImageProps = {
@@ -574,6 +600,45 @@ export default function CreateYourOwnPost() {
     };
     img.onerror = () => console.error("Failed to load stock image.");
   };
+
+  /**
+   * --- ADDED: Function to add AI-generated (or uploaded) image to canvas ---
+   * Takes a base64 data URL
+   */
+  const addAiImage = (src: string) => {
+    disableDrawing();
+    const img = new window.Image();
+    img.src = src;
+    img.onload = () => {
+      // Scale image to fit 50% of the stage
+      const scale = Math.min(stageSize.width * 0.5 / img.naturalWidth, stageSize.height * 0.5 / img.naturalHeight, 1);
+      const newObject: ImageProps = {
+        id: `image-${Date.now()}`, type: 'image', src: src,
+        // Center the new image
+        x: (stageSize.width - img.naturalWidth * scale) / 2, 
+        y: (stageSize.height - img.naturalHeight * scale) / 2,
+        width: img.naturalWidth * scale, 
+        height: img.naturalHeight * scale, 
+        rotation: 0, opacity: 1,
+        brightness: 0, contrast: 0, grayscale: false, sepia: false, invert: false, blur: 0,
+        emboss: false, posterize: 0, stroke: '#000000', strokeWidth: 0,
+        shadowColor: '#000000', shadowBlur: 0, shadowOffsetX: 0, shadowOffsetY: 0, shadowOpacity: 0,
+        naturalWidth: img.naturalWidth, 
+        naturalHeight: img.naturalHeight,
+        cropX: 0, cropY: 0, 
+        cropWidth: img.naturalWidth, 
+        cropHeight: img.naturalHeight,
+      };
+      setObjects(prev => [...prev, newObject]); // Add on top
+      setSelectedId(newObject.id); // Select it
+      setActiveLeftPanel('tools'); // Go back to tools panel
+    };
+    img.onerror = () => {
+      console.error("Failed to load AI image from data URL.");
+      setAiError("Failed to load generated image."); // Show error
+    }
+  };
+
 
   const addText = () => {
     disableDrawing();
@@ -680,6 +745,33 @@ export default function CreateYourOwnPost() {
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const handleAccordionToggle = (title: string) => setOpenAccordion(prev => (prev === title ? null : title));
   useEffect(() => { setOpenAccordion(null); }, [selectedId]);
+
+  // --- ADDED: API Fetch with Exponential Backoff ---
+  const fetchWithRetry = async (url: string, options: RequestInit, retries = MAX_RETRIES, delay = 1000): Promise<any> => {
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        // Don't retry on client errors (4xx)
+        if (response.status >= 400 && response.status < 500) {
+          const errorData = await response.json();
+          throw new Error(`API Error: ${errorData.error?.message || response.statusText}`);
+        }
+        // Retry on server errors (5xx)
+        if (response.status >= 500 && retries > 0) {
+          throw new Error('Server error, retrying...');
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error: any) {
+      if (retries > 0 && error.message.includes('retrying')) {
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return fetchWithRetry(url, options, retries - 1, delay * 2);
+      }
+      throw error;
+    }
+  };
+
 
   const renderPropertiesPanel = () => {
     // Canvas Settings Panel
@@ -904,8 +996,51 @@ export default function CreateYourOwnPost() {
     );
   };
   
+  /**
+   * --- MODIFIED: AI Panel with Loading and API Call ---
+   */
   const renderAIPanel = () => {
-    const handleGenerate = () => console.log("Generate AI Image with prompt:", aiPrompt);
+    
+    const handleGenerate = async () => {
+      if (!aiPrompt || isGenerating || !API_KEY) {
+        if (!API_KEY) {
+          console.error("API Key is missing.");
+          setAiError("API Key is missing. Cannot generate image.");
+        }
+        return;
+      }
+      
+      setIsGenerating(true);
+      setAiError(null);
+
+      const payload = {
+        instances: [{ prompt: aiPrompt }],
+        parameters: { sampleCount: 1 }
+      };
+
+      try {
+        const result = await fetchWithRetry(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        
+        const base64Data = result?.predictions?.[0]?.bytesBase64Encoded;
+        if (base64Data) {
+          const imageUrl = `data:image/png;base64,${base64Data}`;
+          addAiImage(imageUrl); // This function now also closes the panel
+        } else {
+          throw new Error("No image data found in API response.");
+        }
+
+      } catch (error: any) {
+        console.error("AI image generation failed:", error);
+        setAiError(`Generation failed: ${error.message || 'Unknown error'}`);
+      } finally {
+        setIsGenerating(false);
+      }
+    };
+    
     return (
        <div className="flex flex-col h-full">
          <div className="flex items-center mb-4 flex-shrink-0">
@@ -915,9 +1050,26 @@ export default function CreateYourOwnPost() {
          <div className="flex-1 overflow-y-auto pr-2 space-y-4">
             <textarea value={aiPrompt} onChange={(e) => setAiPrompt(e.target.value)} placeholder="Enter your image prompt..."
               className="w-full h-40 px-3 py-2 bg-black/30 border border-white/20 rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-400 resize-none"/>
-             <button onClick={handleGenerate} className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
-               Generate Image
+             
+             {/* --- MODIFIED: Button with loading state --- */}
+             <button 
+                onClick={handleGenerate} 
+                disabled={isGenerating || !aiPrompt}
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-wait"
+              >
+                {isGenerating ? (
+                  <> <Loader2 size={16} className="animate-spin"/> Generating... </>
+                ) : (
+                  'Generate Image'
+                )}
              </button>
+
+             {/* --- ADDED: Error Message Display --- */}
+             {aiError && (
+                <p className="text-xs text-red-400 bg-red-900/50 border border-red-700 p-2 rounded-md">
+                  {aiError}
+                </p>
+             )}
          </div>
        </div>
     );
@@ -1033,3 +1185,4 @@ export default function CreateYourOwnPost() {
     </>
   );
 }
+
