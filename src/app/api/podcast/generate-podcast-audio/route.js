@@ -98,8 +98,8 @@ export async function POST(request) {
       }
 
       let mappedSpeaker = null;
-      if (detectedSpeaker === 'priya') mappedSpeaker = 'anushka';
-      else if (detectedSpeaker === 'arjun') mappedSpeaker = 'abhilash';
+      if (detectedSpeaker === 'anushka') mappedSpeaker = 'anushka';
+      else if (detectedSpeaker === 'abhilash') mappedSpeaker = 'abhilash';
 
       if (!mappedSpeaker) {
         console.warn(`⚠️ Unknown speaker "${detectedSpeaker}" - skipping line`);

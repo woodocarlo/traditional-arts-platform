@@ -1,4 +1,16 @@
-# TODO: Make Host a Workshop Button Active and Create Demo Page
+# TODO: Integrate Gemini Caption Generation in Post Generation APIs
 
-- [x] Edit src/components/FeaturesSection.tsx to wrap the Host Workshop card in a Link component with href="/host-workshop"
-- [x] Create src/app/host-workshop/page.tsx with a demo page including title, description, and basic UI elements
+## Tasks
+- [x] Modify `src/app/api/post_generation/generate-background/route.ts` to generate captions using Gemini after image generation
+- [x] Modify `src/app/api/post_generation/generate-center/route.ts` to generate captions using Gemini after image generation
+- [x] Modify `src/app/api/post_generation/generate-overlay/route.ts` to generate captions using Gemini after image generation
+
+## Details
+Each route will:
+1. Generate image using Vertex AI as before
+2. Use the generated image to call Gemini API for caption generation
+3. Return both image and caption in JSON response
+4. Handle errors for Gemini API calls
+
+## Followup
+- Test the modified routes to ensure functionality

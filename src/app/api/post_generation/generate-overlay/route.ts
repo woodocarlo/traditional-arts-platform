@@ -102,7 +102,47 @@ export async function POST(request: NextRequest) {
 
     if (response.data.predictions && response.data.predictions[0] && response.data.predictions[0].bytesBase64Encoded) {
       const base64Image = response.data.predictions[0].bytesBase64Encoded;
-      return NextResponse.json({ image: `data:image/png;base64,${base64Image}` });
+
+      // Generate caption using Gemini
+      const geminiResponse = await axios.post(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=AIzaSyAtVimUosOHmBfhINtzJcQHuOQqqDyk7FU`,
+        {
+          contents: [
+            {
+              parts: [
+                {
+                  text: 'Generate a suitable caption for this social media post image about traditional crafts. Make it engaging and relevant to the image.',
+                },
+                {
+                  inline_data: {
+                    mime_type: 'image/png',
+                    data: base64Image,
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      let caption = '';
+      if (
+        geminiResponse.data &&
+        geminiResponse.data.candidates &&
+        geminiResponse.data.candidates[0] &&
+        geminiResponse.data.candidates[0].content &&
+        geminiResponse.data.candidates[0].content.parts &&
+        geminiResponse.data.candidates[0].content.parts[0]
+      ) {
+        caption = geminiResponse.data.candidates[0].content.parts[0].text;
+      }
+
+      return NextResponse.json({ image: `data:image/png;base64,${base64Image}`, caption });
     } else {
       throw new Error('No image generated');
     }

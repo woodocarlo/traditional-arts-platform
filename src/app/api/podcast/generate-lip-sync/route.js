@@ -1,86 +1,148 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import os from 'os';
+import FormData from 'form-data';
+import fetch from 'node-fetch';
 
-const execAsync = promisify(exec);
+const LIPSYNC_API_URL = 'https://lipsync-api-819115636598.asia-southeast1.run.app/process';
 
 export async function POST(request) {
-  let tempVideoPath = null;
   let tempAudioPath = null;
-  let outputVideoPath = null;
-
+  
   try {
     const { faceVideoPath, audioData, speaker } = await request.json();
-
+    
     if (!faceVideoPath || !audioData || !speaker) {
-      return NextResponse.json({
-        error: 'Missing required parameters: faceVideoPath, audioData, speaker'
-      }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Missing required parameters: faceVideoPath, audioData, speaker' },
+        { status: 400 }
+      );
     }
 
-    // Create temp directory for processing
-    const tempDir = path.join(os.tmpdir(), `lip-sync-${Date.now()}`);
-    fs.mkdirSync(tempDir, { recursive: true });
+    console.log(`🎬 Calling hosted lip sync API for ${speaker}...`);
+    console.log(`📹 Video path: ${faceVideoPath}`);
+    console.log(`🔊 Audio data size: ${audioData.length} bytes (data URL)`);
 
-    // Save audio data to temp file
-    const audioBuffer = Buffer.from(audioData, 'base64');
-    tempAudioPath = path.join(tempDir, `audio-${speaker}.wav`);
+    // Verify video file exists
+    if (!fs.existsSync(faceVideoPath)) {
+      throw new Error(`Video file not found: ${faceVideoPath}`);
+    }
+
+    // Get video file size
+    const videoStats = fs.statSync(faceVideoPath);
+    console.log(`📊 Video file size: ${videoStats.size} bytes`);
+
+    // Convert base64 audio to buffer (handle data URL format)
+    const base64Data = audioData.includes(',') ? audioData.split(',')[1] : audioData;
+    const audioBuffer = Buffer.from(base64Data, 'base64');
+    console.log(`📊 Audio buffer size: ${audioBuffer.length} bytes`);
+    
+    // Create temp directory
+    const tempDir = path.join(process.cwd(), 'temp');
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true });
+    }
+    
+    // Save audio to temp file
+    tempAudioPath = path.join(tempDir, `audio-${speaker}-${Date.now()}.wav`);
     fs.writeFileSync(tempAudioPath, audioBuffer);
+    console.log(`✅ Audio file saved: ${tempAudioPath} (${fs.statSync(tempAudioPath).size} bytes)`);
 
-    // Copy face video to temp directory
-    tempVideoPath = path.join(tempDir, `face-${speaker}.webm`);
-    fs.copyFileSync(faceVideoPath, tempVideoPath);
+    // Create FormData
+    const form = new FormData();
+    form.append('video', fs.createReadStream(faceVideoPath), {
+      filename: 'input.mp4',
+      contentType: 'video/mp4'
+    });
+    form.append('audio', fs.createReadStream(tempAudioPath), {
+      filename: 'audio.wav',
+      contentType: 'audio/wav'
+    });
 
-    // Output path for lip-synced video
-    outputVideoPath = path.join(tempDir, `output-${speaker}.mp4`);
+    console.log(`📤 Uploading to lip sync API: ${LIPSYNC_API_URL}`);
 
-    // Call lip sync processing (placeholder - replace with actual lip sync command)
-    // This assumes you have a lip sync tool available
-    const lipSyncCommand = `python lip_sync.py --video "${tempVideoPath}" --audio "${tempAudioPath}" --output "${outputVideoPath}"`;
+    // Call the hosted lip sync API with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 900000); // 15 min timeout
 
-    try {
-      await execAsync(lipSyncCommand, { cwd: process.cwd() });
-    } catch (error) {
-      console.error('Lip sync processing failed:', error);
-      // For now, just copy the original video as output
-      fs.copyFileSync(tempVideoPath, outputVideoPath);
+    const response = await fetch(LIPSYNC_API_URL, {
+      method: 'POST',
+      body: form,
+      headers: form.getHeaders(),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    console.log(`📡 Response status: ${response.status} ${response.statusText}`);
+
+    if (!response.ok) {
+      const contentType = response.headers.get('content-type');
+      let errorText = '';
+      
+      if (contentType && contentType.includes('application/json')) {
+        const errorJson = await response.json();
+        errorText = JSON.stringify(errorJson);
+      } else {
+        errorText = await response.text();
+      }
+      
+      console.error(`❌ API returned error: ${errorText}`);
+      throw new Error(`Lip sync API error: ${response.status} ${response.statusText} - ${errorText || 'No error details provided'}`);
     }
 
-    // Read the output video
-    const outputVideoBuffer = fs.readFileSync(outputVideoPath);
-    const base64Video = outputVideoBuffer.toString('base64');
+    console.log(`📥 Receiving processed video from API...`);
+
+    // Get the video buffer from response
+    const videoBuffer = await response.buffer();
+    
+    if (!videoBuffer || videoBuffer.length === 0) {
+      throw new Error('Received empty video buffer from API');
+    }
+    
+    const base64Video = videoBuffer.toString('base64');
+    
+    console.log(`✅ Lip sync video received: ${videoBuffer.length} bytes (${base64Video.length} base64)`);
 
     // Clean up temp files
-    try {
-      fs.rmSync(tempDir, { recursive: true, force: true });
-    } catch (cleanupError) {
-      console.error('Error cleaning up temp files:', cleanupError);
+    if (tempAudioPath && fs.existsSync(tempAudioPath)) {
+      try {
+        fs.unlinkSync(tempAudioPath);
+        console.log('✅ Temp audio file cleaned up');
+      } catch (cleanupError) {
+        console.warn('⚠️ Could not clean up temp file:', cleanupError);
+      }
     }
 
     return NextResponse.json({
       success: true,
       videoData: base64Video,
-      speaker
+      speaker,
+      size: videoBuffer.length
     });
 
   } catch (error) {
-    console.error('Error in lip sync generation:', error);
-
-    // Clean up temp files on error
-    try {
-      if (tempVideoPath && fs.existsSync(path.dirname(tempVideoPath))) {
-        fs.rmSync(path.dirname(tempVideoPath), { recursive: true, force: true });
+    console.error('❌ Error in lip sync generation:', error);
+    
+    // Clean up on error
+    if (tempAudioPath && fs.existsSync(tempAudioPath)) {
+      try {
+        fs.unlinkSync(tempAudioPath);
+      } catch (cleanupError) {
+        console.warn('⚠️ Could not clean up temp file:', cleanupError);
       }
-    } catch (cleanupError) {
-      console.error('Error cleaning up temp files:', cleanupError);
     }
 
-    return NextResponse.json({
-      error: 'Failed to generate lip sync',
-      details: error.message
-    }, { status: 500 });
+    // Provide more detailed error message
+    const errorMessage = error.message || 'Unknown error';
+    const isTimeout = errorMessage.includes('aborted');
+    
+    return NextResponse.json(
+      { 
+        error: 'Failed to generate lip sync', 
+        details: isTimeout ? 'Request timed out after 15 minutes. Video might be too long.' : errorMessage 
+      },
+      { status: 500 }
+    );
   }
 }
