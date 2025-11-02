@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from 'next/image';
 import axios from 'axios';
 
@@ -44,11 +44,7 @@ const ExpandIcon = () => (
 const LoadingSpinner = () => (
   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
 );
-const SparkleIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 3v.01M16.2 4.2l.01.01M20 8v.01M21 12v.01M20 16l.01.01M16.2 19.8l.01.01M12 21v.01M7.8 19.8l-.01.01M4 16v.01M3 12v.01M4 8l-.01.01M7.8 4.2l-.01.01"/>
-  </svg>
-);
+
 const ChevronLeftIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="15 18 9 12 15 6"></polyline>
@@ -64,16 +60,7 @@ const FacebookIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" he
 const TwitterIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>;
 const ShareIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>;
 
-const fontLibrary = {
-  "Playfair Display": "font-playfair",
-  "Montserrat": "font-montserrat",
-  "Pacifico": "font-pacifico",
-  "Dancing Script": "font-dancing",
-  "Roboto": "font-roboto",
-  "Oswald": "font-oswald",
-  "Lobster": "font-lobster",
-  "Merriweather": "font-merriweather",
-};
+
 
 export default function CraftPostGenerator() {
   const [uploadedImage, setUploadedImage] = useState<string>("");
@@ -86,11 +73,8 @@ export default function CraftPostGenerator() {
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [generationMessage, setGenerationMessage] = useState<string>("");
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
-  const [isAIDisabled, setIsAIDisabled] = useState<boolean>(false);
   const [description, setDescription] = useState<string>("");
   const [postType, setPostType] = useState<string>("Shop Drop");
-
-  const canvasRefs = useRef<(HTMLCanvasElement | null)[]>([]);
 
   const generationSteps = [
     'Analyzing your craft...',
@@ -211,7 +195,7 @@ export default function CraftPostGenerator() {
         setCurrentStep(i + 2);
         setGenerationMessage(`Generating ${postType === "Unfold the Tale" ? 'slide' : 'variation'} ${i + 1} of ${numImages}...`);
 
-        let prompt = promptList[i]
+        const prompt = promptList[i]
             .replace(/\[ART_TYPE\]/g, artType) // 'g' flag to replace all instances
             .replace('[ASPECT_RATIO]', aspectRatio);
         
@@ -432,7 +416,7 @@ export default function CraftPostGenerator() {
       if (posts[currentSlide]) {
         drawPostToCanvas(posts[currentSlide], currentSlide, canvasRef.current);
       }
-    }, [currentSlide, posts, aspectRatio]);
+    }, [currentSlide, posts]);
 
     const nextSlide = () => {
       setCurrentSlide(prev => (prev === posts.length - 1 ? 0 : prev + 1));
@@ -491,7 +475,7 @@ export default function CraftPostGenerator() {
 
     useEffect(() => {
       drawPostToCanvas(post, index, canvasRef.current);
-    }, [post, aspectRatio]);
+    }, [post]);
 
     return (
       <div className="bg-white/5 p-4 rounded-lg border border-white/20">
@@ -743,7 +727,7 @@ export default function CraftPostGenerator() {
           className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center"
           onClick={() => setExpandedImage(null)}
         >
-          <img src={expandedImage} alt="Expanded view" className="max-w-[90vw] max-h-[90vh] object-contain" />
+      <Image src={expandedImage} alt="Expanded view" width={800} height={600} className="max-w-[90vw] max-h-[90vh] object-contain" />
           <button onClick={() => setExpandedImage(null)} className="absolute top-4 right-4 p-2 bg-black/50 rounded-full text-white hover:bg-black/70">
             <CloseIcon />
           </button>

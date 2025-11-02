@@ -29,18 +29,18 @@ const HostWorkshopPage = () => {
       price: '25',
       type: 'Teaching',
       platform: 'Zoom',
-      image: 'https://images.unsplash.com/photo-1610492934078-de91a92e1c9d?q=80&w=400&auto=format&fit=crop',
+      image: 'https://i.postimg.cc/FHcDzTFc/image.png',
     },
     {
       id: '2',
-      title: 'Introduction to Digital Art with Procreate',
+      title: 'Introduction to traditional Art',
       description: 'Discover the basics of digital illustration using Procreate on iPad. We’ll cover brushes, layers, and essential tools to get you started.',
       date: '2023-12-01',
       duration: '2 hours',
       price: 'Free',
       type: 'Interactive',
       platform: 'YouTube Live',
-      image: 'https://images.unsplash.com/photo-1549298370-360b94098939?q=80&w=400&auto=format&fit=crop',
+      image: 'https://i.postimg.cc/7hFSyy2s/image.png',
     },
     {
       id: '3',
@@ -51,7 +51,7 @@ const HostWorkshopPage = () => {
       price: '40',
       type: 'Product Display',
       platform: 'Google Meet',
-      image: 'https://images.unsplash.com/photo-151748680-e2b292e07974?q=80&w=400&auto=format&fit=crop',
+      image: 'https://i.postimg.cc/JngkbWPB/image.png',
     },
   ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -306,7 +306,10 @@ const HostWorkshopPage = () => {
         </div>
 
         {workshops.length === 0 ? (
-          <p className="text-center text-gray-600 text-lg">You haven't created any workshops yet. Click "Create New Workshop" to get started!</p>
+          <p className="text-center text-gray-600 text-lg">
+            {/* --- FIX 2: Replaced ' and " with HTML entities --- */}
+            You haven&apos;t created any workshops yet. Click &quot;Create New Workshop&quot; to get started!
+          </p>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {workshops.map((workshop) => (
@@ -481,6 +484,32 @@ const HostWorkshopPage = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* --- FIX 1: Added Delete Confirmation Modal --- */}
+        {isDeleteModalOpen && (
+          <div className="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-md flex items-center justify-center p-4 z-50">
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-2xl max-w-sm w-full transform scale-95 animate-scaleIn">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">Confirm Deletion</h3>
+              <p className="text-gray-700 text-center mb-6">Are you sure you want to delete this workshop? This action cannot be undone.</p>
+              <div className="flex justify-center space-x-4">
+                <button
+                  type="button"
+                  onClick={() => setIsDeleteModalOpen(false)}
+                  className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmDelete}
+                  className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
         )}

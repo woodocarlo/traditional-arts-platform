@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Hardcoded API key - NOT RECOMMENDED for production
-const API_KEY = 'AIzaSyAtVimUosOHmBfhINtzJcQHuOQqqDyk7FU';
+const API_KEY = 'AIzaSyCoaNv8rp-UVQ3uqio5VD9dIAZQsPR5ok4';
 const MODEL_NAME = 'gemini-2.5-flash-image-preview';
 
 export async function POST(request: NextRequest) {
@@ -62,10 +62,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Gemini API Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to generate image';
     return NextResponse.json(
-      { error: error.message || 'Failed to generate image' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
