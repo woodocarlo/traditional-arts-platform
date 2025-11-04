@@ -343,7 +343,7 @@ const HostWorkshopPage = () => {
                     name="title"
                     value={newWorkshop.title}
                     onChange={handleInputChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-amber-500 focus:border-amber-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-50 focus:ring-amber-500 focus:border-amber-500"
                     placeholder="e.g., Introduction to Digital Painting"
                     required
                   />
@@ -356,7 +356,7 @@ const HostWorkshopPage = () => {
                     value={newWorkshop.description}
                     onChange={handleInputChange}
                     rows={3}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-amber-500 focus:border-amber-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-50 focus:ring-amber-500 focus:border-amber-500"
                     placeholder="What will participants learn?"
                     required
                   />
@@ -370,7 +370,7 @@ const HostWorkshopPage = () => {
                       name="date"
                       value={newWorkshop.date}
                       onChange={handleInputChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-amber-500 focus:border-amber-500"
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-50 focus:ring-amber-500 focus:border-amber-500"
                       required
                     />
                   </div>
@@ -382,7 +382,7 @@ const HostWorkshopPage = () => {
                       name="duration"
                       value={newWorkshop.duration}
                       onChange={handleInputChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-amber-500 focus:border-amber-500"
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-50 focus:ring-amber-500 focus:border-amber-500"
                       placeholder="e.g., 90 mins, 3 hours"
                       required
                     />
@@ -396,7 +396,7 @@ const HostWorkshopPage = () => {
                       name="price"
                       value={newWorkshop.price}
                       onChange={handleInputChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-amber-500 focus:border-amber-500"
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-50 focus:ring-amber-500 focus:border-amber-500"
                     >
                       <option value="Free">Free</option>
                       <option value="10">$10</option>
@@ -412,7 +412,7 @@ const HostWorkshopPage = () => {
                       name="type"
                       value={newWorkshop.type}
                       onChange={handleInputChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-amber-500 focus:border-amber-500"
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-50 focus:ring-amber-500 focus:border-amber-500"
                     >
                       <option value="Teaching">Teaching/Tutorial</option>
                       <option value="Interactive">Interactive Session</option>
