@@ -3,6 +3,9 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // API key from environment variable
 const API_KEY = process.env.generate_image_api;
+if (!API_KEY) {
+  throw new Error('generate_image_api environment variable is not set');
+}
 const MODEL_NAME = 'gemini-2.5-flash-image-preview';
 
 export async function POST(request: NextRequest) {
