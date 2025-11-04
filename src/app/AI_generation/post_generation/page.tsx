@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Image from 'next/image';
 import axios from 'axios';
 
-const REMOVE_BG_API_KEY = process.env.NEXT_PUBLIC_REMOVE_BG_API_KEY || "rnYsL35fBiWXmzFF4XxdRULo";
+const REMOVE_BG_API_KEY = process.env.NEXT_PUBLIC_REMOVE_BG_API_KEY || "e4SioiZoiXNbMsXPXtXeYBR5";
 
 // **REMOVED** The static STORY_TEMPLATE is GONE.
 // We will now generate prompts dynamically.

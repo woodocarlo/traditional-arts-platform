@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Hardcoded API key - NOT RECOMMENDED for production
-const API_KEY = 'AIzaSyCoaNv8rp-UVQ3uqio5VD9dIAZQsPR5ok4';
+// API key from environment variable
+const API_KEY = process.env.generate_image_api;
 const MODEL_NAME = 'gemini-2.5-flash-image-preview';
 
 export async function POST(request: NextRequest) {
