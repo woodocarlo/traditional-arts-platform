@@ -13,7 +13,7 @@ export async function POST(request) {
   }
 
   try {
-    const { topic, customQuestions, uploadedStories, length, language, hostName, artistName, type } = await request.json();
+    const { topic, customQuestions, uploadedStories, length, language, hostName, artistName, type, gender } = await request.json();
     
     console.log('🔍 Request received with data:', {
       topic,
@@ -51,24 +51,25 @@ export async function POST(request) {
     }
 
     let prompt = '';
-    
+
     if (type === 'face') {
       // Single person storytelling/monologue for face videos
+      const narratorGenderText = gender === 'male' ? 'male' : 'female';
       prompt = 'You are a storytelling script writer. Create a CONCISE ' + length + ' narrative script (approximately ' + durationGuide + ') in ' + language + ' language about "' + topic + '".\n\n' +
-      'Speaker name: ' + artistName + storiesContext + '\n\n' +
+      'Narrator gender: ' + narratorGenderText + storiesContext + '\n\n' +
       'IMPORTANT:\n' +
       '- Keep it SHORT and FOCUSED (approximately ' + durationGuide + ')\n' +
       '- Write as a single-person narrative/story directly to the audience\n' +
-      '- Format each line as: "' + artistName + ': What they say"\n' +
+      '- The narrator is ' + narratorGenderText + ', so use appropriate language and tone\n' +
       '- Make it engaging, personal, and conversational\n' +
       '- NO long-winded explanations\n' +
       '- Get to the point quickly\n' +
       '- Warm tone appropriate for Indian audience\n\n' +
       'Example format:\n' +
-      artistName + ': Hello everyone! Today I want to share something special about ' + topic + '.\n' +
-      artistName + ': Let me tell you a quick story about this...\n\n' +
-      'Return ONLY the monologue in this format. NO JSON, NO markdown, NO code blocks. Just the speech with "Name: dialogue" format. Keep it BRIEF!';
-      
+      'Hello everyone! Today I want to share something special about ' + topic + '.\n' +
+      'Let me tell you a quick story about this...\n\n' +
+      'Return ONLY the monologue text. NO JSON, NO markdown, NO code blocks, NO speaker names. Just the plain speech text. Keep it BRIEF!';
+
     } else {
       // Dialogue for audio-only podcasts
       prompt = 'You are a podcast script writer. Create a ' + length + ' podcast script (approximately ' + durationGuide + ') in ' + language + ' language about "' + topic + '".\n\n' +
