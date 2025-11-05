@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Hardcoded API key - NOT RECOMMENDED for production
-const API_KEY = 'AIzaSyAtVimUosOHmBfhINtzJcQHuOQqqDyk7FU';
+const API_KEY = 'AIzaSyD15NUBMkAzHqAv4q3nRVR-E8OV339YDYk';
 const MODEL_NAME = 'gemini-2.5-flash-image-preview';
 
 export async function POST(request: NextRequest) {
