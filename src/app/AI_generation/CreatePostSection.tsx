@@ -154,8 +154,8 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
     language: 'Hindi',
     length: 'medium',
     type: 'audio', // Default to audio
-    hostName: 'Anushka', // Default for audio - matches API speaker
-    participantName: 'Abhilash', // Default for audio - matches API speaker
+    hostName: 'Priya', // Default for audio
+    participantName: 'Arjun', // Default for audio
     gender: 'female', // Default gender
     topic: '',
     customQuestions: [],
@@ -171,7 +171,8 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
   const [isEditingScript, setIsEditingScript] = useState<boolean>(false);
   const [isFaceModalOpen, setIsFaceModalOpen] = useState<boolean>(false);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
-  const [faceVideoPath, setFaceVideoPath] = useState<string | null>(null);
+  const [faceVideoBlob, setFaceVideoBlob] = useState<Blob | null>(null);
+  const [faceVideoExt, setFaceVideoExt] = useState<string>('.webm'); // Store extension
   const [lipSyncVideoUrl, setLipSyncVideoUrl] = useState<string | null>(null);
 
   // Add state for narrator gender
@@ -318,7 +319,7 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
       setCurrentStep(2);
 
       // Step 3: Generate audio based on type
-      if (podcastConfig.type === 'face' && faceVideoPath) {
+      if (podcastConfig.type === 'face' && faceVideoBlob) {
         console.log('📹 Face podcast - will generate separate audio tracks for lip sync');
         // Skip combined audio generation for face podcasts
       } else {
@@ -327,9 +328,9 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
       }
 
     // Step 4: Generate lip sync video if face video is uploaded and type is face
-      if (podcastConfig.type === 'face' && faceVideoPath) {
+      if (podcastConfig.type === 'face' && faceVideoBlob) {
         setCurrentStep(3);
-        await generateLipSyncVideo(script, faceVideoPath);
+        await generateLipSyncVideo(script, faceVideoBlob);
       } else {
         setCurrentStep(3);
       }
@@ -421,91 +422,62 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
 };
 
 
-  const generateLipSyncVideo = async (script: string, faceVideoPath: string) => {
-  try {
-    console.log('🎬 Generating lip sync video...');
+  // --- MODIFICATION: This function now sends FormData ---
+  const generateLipSyncVideo = async (script: string, videoBlob: Blob) => {
+    try {
+      console.log('🎬 Generating lip sync video...');
 
-    // For face podcasts, generate only 1 combined audio with whole text at once
-    console.log('🎵 Generating combined audio for face podcast...');
-    const combinedAudioResponse = await fetch('/api/podcast/generate-podcast-audio', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        script,
-        language: podcastConfig.language,
-        gender: narratorGender // Use narrator gender for the single audio
-      })
-    });
+      // Create FormData to send video and script together
+      const formData = new FormData();
+      formData.append('script', script);
+      formData.append('language', podcastConfig.language);
+      formData.append('gender', narratorGender);
+      formData.append('video', videoBlob, `face-video${faceVideoExt}`);
 
-    if (!combinedAudioResponse.ok) {
-      throw new Error('Failed to generate combined audio');
+      // Single API call to generate everything
+      const lipSyncResponse = await fetch('/api/podcast/generate-lip-sync', {
+        method: 'POST',
+        body: formData, // Send FormData, not JSON
+        // Do not set Content-Type, browser does it for FormData
+      });
+
+      if (!lipSyncResponse.ok) {
+        const error = await lipSyncResponse.json();
+        throw new Error(error.error || 'Lip sync generation failed');
+      }
+
+      const lipSyncData = await lipSyncResponse.json();
+
+      // Set the lip-sync video URL
+      const lipSyncVideoUrl = `data:video/mp4;base64,${lipSyncData.videoData}`;
+      setLipSyncVideoUrl(lipSyncVideoUrl);
+
+      // Also set combined audio URL for the player
+      const combinedAudioUrl = `data:audio/wav;base64,${lipSyncData.audioData}`;
+      setAudioUrl(combinedAudioUrl);
+
+      console.log('✅ Lip sync video and combined audio generated successfully!');
+
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('❌ Error generating lip sync video:', error);
+        alert(`Video generation failed: ${error.message}`);
+      }
     }
-
-    const combinedAudioBlob = await combinedAudioResponse.blob();
-    const combinedAudioBase64 = await new Promise<string>((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
-      reader.readAsDataURL(combinedAudioBlob);
-    });
-
-    // Generate lip sync using the single combined audio
-    const participantName = podcastConfig.participantName.toLowerCase();
-
-    console.log(`🎥 Generating lip sync for ${participantName} using combined audio...`);
-
-    const lipSyncResponse = await fetch('/api/podcast/generate-lip-sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        faceVideoPath,
-        audioData: `data:audio/wav;base64,${combinedAudioBase64}`,
-        speaker: participantName
-      })
-    });
-
-    if (!lipSyncResponse.ok) {
-      throw new Error('Lip sync generation failed');
-    }
-
-    const lipSyncData = await lipSyncResponse.json();
-
-    // Set the lip-sync video URL directly
-    const lipSyncVideoUrl = `data:video/mp4;base64,${lipSyncData.videoData}`;
-    setLipSyncVideoUrl(lipSyncVideoUrl);
-
-    // Also set combined audio URL for the player
-    const combinedAudioUrl = `data:audio/wav;base64,${combinedAudioBase64}`;
-    setAudioUrl(combinedAudioUrl);
-
-    console.log('✅ Lip sync video and combined audio generated successfully!');
-
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error('❌ Error generating lip sync video:', error);
-      alert(`Video generation failed: ${error.message}`);
-    }
-  }
-};
+  };
 
   // --- MODIFICATION: Moved topic arrays here ---
   const audioSuggestedTopics = ['Youth Engagement with Folk Art', 'History of traditional crafts', 'Tanjore Painting'];
   const faceSuggestedTopics = ['My Art Journey', 'A Studio Tour', 'My Painting Tips', 'Behind the Artwork'];
 
 
-  const steps = podcastConfig.type === 'audio'
-    ? [
-        'Generating script...',
-        'Saving podcast...',
-        'Generating audio...',
-        'Polishing final touches...'
-      ]
-    : [
-        'Generating script...',
-        'Saving podcast...',
-        'Generating audio...',
-        'Creating lip sync...',
-        'Polishing final touches...'
-      ];
+  const steps = [
+    'Generating script...',
+    'Saving podcast...',
+    'Generating audio...',
+    'Creating lip sync...',
+    'Polishing final touches...'
+  ];
 
   // --- MODIFICATION: Removed suggestedTopics from here ---
   
@@ -685,10 +657,10 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
                 <button
                   onClick={() => setIsFaceModalOpen(true)}
                   className={`w-full p-3 rounded-lg text-white font-medium transition-colors ${
-                    faceVideoPath ? 'bg-green-600 hover:bg-green-700' : 'bg-purple-600 hover:bg-purple-700'
+                    faceVideoBlob ? 'bg-green-600 hover:bg-green-700' : 'bg-purple-600 hover:bg-purple-700'
                   }`}
                 >
-                  {faceVideoPath ? 'Face Video Uploaded ✓' : 'Upload Face Video'}
+                  {faceVideoBlob ? 'Face Video Uploaded ✓' : 'Upload Face Video'}
                 </button>
               </div>
               <div className="space-y-2">
@@ -856,8 +828,9 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
           setIsFaceModalOpen(false);
           forceStopCamera();
         }}
-        onUploadSuccess={(tempFilePath) => {
-          setFaceVideoPath(tempFilePath);
+        onUploadSuccess={(videoBlob, fileExtension) => {
+          setFaceVideoBlob(videoBlob);
+          setFaceVideoExt(fileExtension);
         }}
       />}
     </div>

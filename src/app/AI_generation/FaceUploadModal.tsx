@@ -8,7 +8,8 @@ const CloseIcon = () => (
   </svg>
 );
 
-const FaceUploadModal = ({ onClose, onUploadSuccess }: { onClose: () => void; onUploadSuccess?: (tempFilePath: string) => void }) => {
+// --- MODIFICATION: Prop type changed from string to Blob ---
+const FaceUploadModal = ({ onClose, onUploadSuccess }: { onClose: () => void; onUploadSuccess?: (videoBlob: Blob, fileExtension: string) => void }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const currentStreamRef = useRef<MediaStream | null>(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -26,7 +27,6 @@ const FaceUploadModal = ({ onClose, onUploadSuccess }: { onClose: () => void; on
       currentStreamRef.current.getTracks().forEach(track => track.stop());
       currentStreamRef.current = null;
     }
-    // Also clear the video element's srcObject
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
@@ -35,26 +35,19 @@ const FaceUploadModal = ({ onClose, onUploadSuccess }: { onClose: () => void; on
   useEffect(() => {
     const getCameraStream = async () => {
       try {
-        // First, request permission with default video
         const initialStream = await navigator.mediaDevices.getUserMedia({ video: true });
-        // Stop the initial stream as we'll get a specific one
         initialStream.getTracks().forEach(track => track.stop());
 
-        // Now enumerate devices with permission granted
         const deviceList = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = deviceList.filter(device => device.kind === 'videoinput');
         setDevices(videoDevices);
 
-        // Select the first device that doesn't appear to be from a phone
         const laptopDevice = videoDevices.find(device =>
-          !device.label.toLowerCase().includes('phone') &&
-          !device.label.toLowerCase().includes('android') &&
-          !device.label.toLowerCase().includes('iphone')
+          !device.label.toLowerCase().includes('phone')
         ) || videoDevices[0];
 
         if (laptopDevice) {
           setSelectedDeviceId(laptopDevice.deviceId);
-          // Get stream with the selected device
           const stream = await navigator.mediaDevices.getUserMedia({
             video: { deviceId: { exact: laptopDevice.deviceId } }
           });
@@ -69,7 +62,6 @@ const FaceUploadModal = ({ onClose, onUploadSuccess }: { onClose: () => void; on
     };
     getCameraStream();
 
-    // Cleanup function to stop the camera stream when component unmounts
     return () => {
       stopCurrentStream();
       if (recordingTimerRef.current) {
@@ -117,8 +109,24 @@ const FaceUploadModal = ({ onClose, onUploadSuccess }: { onClose: () => void; on
   const handleStartRecording = () => {
     if (videoRef.current && videoRef.current.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
-      const recorder = new MediaRecorder(stream);
+      
+      const options = { mimeType: 'video/mp4' };
+      let recorder;
+      try {
+        if (MediaRecorder.isTypeSupported(options.mimeType)) {
+          recorder = new MediaRecorder(stream, options);
+          console.log('Recording with video/mp4');
+        } else {
+          console.warn('video/mp4 not supported, falling back to webm');
+          recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+        }
+      } catch (e) {
+        console.error('Error creating MediaRecorder, falling back to webm:', e);
+        recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+      }
+
       setMediaRecorder(recorder);
+      
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           setRecordedChunks((prev) => [...prev, event.data]);
@@ -142,10 +150,7 @@ const FaceUploadModal = ({ onClose, onUploadSuccess }: { onClose: () => void; on
   const handleDeviceChange = async (deviceId: string) => {
     setSelectedDeviceId(deviceId);
     try {
-      // Stop current stream
       stopCurrentStream();
-
-      // Get new stream with selected device
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { deviceId: { exact: deviceId } }
       });
@@ -166,39 +171,20 @@ const FaceUploadModal = ({ onClose, onUploadSuccess }: { onClose: () => void; on
     onClose();
   };
 
-  const handleUploadVideo = async () => {
+  // --- MODIFICATION: This function no longer uploads. ---
+  // It just passes the recorded Blob back to the parent.
+  const handleConfirmVideo = () => {
     if (recordedChunks.length > 0) {
-      const blob = new Blob(recordedChunks, { type: "video/webm" });
+      
+      const mimeType = mediaRecorder?.mimeType || 'video/webm';
+      const fileExtension = mimeType.includes('mp4') ? '.mp4' : '.webm';
+      
+      const blob = new Blob(recordedChunks, { type: mimeType });
 
-      try {
-        const formData = new FormData();
-        formData.append('video', blob, 'face-video.webm');
-
-        const response = await fetch('/api/upload-face-video', {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          console.log("Video uploaded successfully:", result);
-
-          // Call the success callback with the temp file path
-          if (onUploadSuccess && result.tempFilePath) {
-            onUploadSuccess(result.tempFilePath);
-          }
-
-          alert("Face video uploaded successfully!");
-        } else {
-          const error = await response.json();
-          console.error("Upload failed:", error);
-          alert(`Upload failed: ${error.error}`);
-        }
-      } catch (error) {
-        console.error("Error uploading video:", error);
-        alert("Error uploading video. Please try again.");
+      if (onUploadSuccess) {
+        onUploadSuccess(blob, fileExtension);
       }
-
+      
       setRecordedChunks([]);
       handleClose();
     }
@@ -317,13 +303,16 @@ const FaceUploadModal = ({ onClose, onUploadSuccess }: { onClose: () => void; on
               >
                 {isRecording ? 'Stop Recording' : 'Record'}
               </button>
+              
+              {/* --- MODIFICATION: "Upload Video" is now "Confirm Video" --- */}
               <button
-                onClick={handleUploadVideo}
+                onClick={handleConfirmVideo}
                 disabled={recordedChunks.length === 0}
-                className="px-6 py-3 rounded-lg font-semibold transition-all bg-gray-600 hover:bg-gray-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-3 rounded-lg font-semibold transition-all bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Upload Video
+                Confirm Video
               </button>
+              
               <button
                 onClick={handleClose}
                 className="px-6 py-3 rounded-lg font-semibold transition-all bg-gray-600 hover:bg-gray-700 text-white"

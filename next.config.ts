@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Your existing images configuration
   images: {
     loader: "default",
     loaderFile: "",
@@ -21,6 +22,15 @@ const nextConfig: NextConfig = {
     contentSecurityPolicy: "script-src 'none'; frame-src 'none'; sandbox;",
     contentDispositionType: "inline",
     unoptimized: true,
+  },
+
+  // --- ADDITION ---
+  // This tells Next.js not to bundle '@ffmpeg-installer/ffmpeg'
+  // and to use the package from node_modules at runtime.
+  webpack(config) {
+    config.externals = config.externals || [];
+    config.externals.push('@ffmpeg-installer/ffmpeg');
+    return config;
   },
 };
 
