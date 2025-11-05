@@ -154,8 +154,8 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
     language: 'Hindi',
     length: 'medium',
     type: 'audio', // Default to audio
-    hostName: 'Priya', // Default for audio
-    participantName: 'Arjun', // Default for audio
+    hostName: 'Anushka', // Default for audio - matches API speaker
+    participantName: 'Abhilash', // Default for audio - matches API speaker
     gender: 'female', // Default gender
     topic: '',
     customQuestions: [],
@@ -613,10 +613,10 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
                 <button
                   key="audio"
                   onClick={() => setPodcastConfig(prev => ({
-                    ...prev, 
+                    ...prev,
                     type: 'audio',
-                    hostName: 'Priya', // Set fixed names for audio
-                    participantName: 'Arjun'
+                    hostName: 'Anushka', // Set names that match API speakers
+                    participantName: 'Abhilash'
                   }))}
                   className={`p-3 rounded-lg border transition-all ${
                     podcastConfig.type === 'audio'
