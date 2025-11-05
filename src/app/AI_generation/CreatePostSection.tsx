@@ -492,13 +492,20 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
   const faceSuggestedTopics = ['My Art Journey', 'A Studio Tour', 'My Painting Tips', 'Behind the Artwork'];
 
 
-  const steps = [
-    'Generating script...',
-    'Saving podcast...',
-    'Generating audio...',
-    'Creating lip sync...',
-    'Polishing final touches...'
-  ];
+  const steps = podcastConfig.type === 'audio'
+    ? [
+        'Generating script...',
+        'Saving podcast...',
+        'Generating audio...',
+        'Polishing final touches...'
+      ]
+    : [
+        'Generating script...',
+        'Saving podcast...',
+        'Generating audio...',
+        'Creating lip sync...',
+        'Polishing final touches...'
+      ];
 
   // --- MODIFICATION: Removed suggestedTopics from here ---
   
