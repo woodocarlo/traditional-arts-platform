@@ -5,8 +5,15 @@ import { Stage, Layer, Text, Transformer } from 'react-konva';
 import { useEditorStore, CanvasObject } from './store';
 import Konva from 'konva';
 
+interface CanvasElementProps {
+  obj: CanvasObject;
+  isSelected: boolean;
+  onSelect: () => void;
+  onChange: (newAttrs: CanvasObject) => void;
+}
+
 // CanvasElement component remains the same as before
-const CanvasElement = ({ obj, isSelected, onSelect, onChange }: any) => {
+const CanvasElement = ({ obj, isSelected, onSelect, onChange }: CanvasElementProps) => {
   const shapeRef = useRef<Konva.Text>(null);
 
   const handleDragEnd = (e: Konva.KonvaEventObject<DragEvent>) => {
@@ -30,11 +37,11 @@ const CanvasElement = ({ obj, isSelected, onSelect, onChange }: any) => {
   };
 
   if (obj.type === 'text') {
+    const { type, ...textProps } = obj;
     return (
       <Text
         ref={shapeRef}
-        id={obj.id}
-        {...obj}
+        {...textProps}
         draggable
         onClick={onSelect}
         onTap={onSelect}
@@ -69,7 +76,7 @@ export default function CanvasArea() {
     }
   }, [selectedId]);
 
-  const handleDeselect = (e: Konva.KonvaEventObject<MouseEvent>) => {
+  const handleDeselect = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
     const clickedOnEmpty = e.target === e.target.getStage();
     if (clickedOnEmpty) {
       setSelectedId(null);

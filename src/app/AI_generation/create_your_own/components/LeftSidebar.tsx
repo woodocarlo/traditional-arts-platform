@@ -3,11 +3,18 @@
 import { Type, ImageIcon, Palette, Pencil, Sparkles, Shapes, GalleryHorizontal } from 'lucide-react';
 import { useEditorStore } from './store';
 
-// Reusable Button Component
-const ToolButton = ({ icon: Icon, label, onClick }: any) => (
+// FIX: Added a specific type for the button props
+type ToolButtonProps = {
+  icon: React.ElementType; // Use React.ElementType for component icons
+  label: string;
+  onClick?: () => void; // onClick is optional
+};
+
+const ToolButton = ({ icon: Icon, label, onClick }: ToolButtonProps) => (
   <button
     onClick={onClick}
     className="flex w-full flex-col items-center justify-center gap-1 rounded-lg p-2 text-gray-400 hover:bg-purple-700 hover:text-white"
+    disabled={!onClick} // Good practice to disable if no onClick is provided
   >
     <Icon size={24} />
     <span className="text-xs">{label}</span>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useEditorStore } from './store';
-import { X } from 'lucide-react';
+// import { X } from 'lucide-react'; // <-- FIX 1: Removed unused import
 
 const PRESET_SIZES = [
   { name: 'Square', ratio: '1:1', dims: '(1080x1080px)', width: 1080, height: 1080 },
@@ -13,7 +13,15 @@ const PRESET_SIZES = [
   { name: 'A4 Document', ratio: '210:297', dims: '(794x1123px)', width: 794, height: 1123 },
 ];
 
-const PresetButton = ({ name, ratio, dims, onClick }: any) => (
+// FIX 2: Added a specific type for the button props
+type PresetButtonProps = {
+  name: string;
+  ratio: string;
+  dims: string;
+  onClick: () => void;
+};
+
+const PresetButton = ({ name, ratio, dims, onClick }: PresetButtonProps) => (
   <button onClick={onClick} className="w-full rounded-md border border-gray-700 bg-gray-800 p-3 text-left hover:bg-gray-700">
     <p className="font-semibold text-white">{name}</p>
     <p className="text-sm text-gray-400">{ratio} <span className="text-gray-500">{dims}</span></p>
@@ -37,7 +45,6 @@ export default function ChooseCanvasSizeModal() {
         <h2 className="mb-4 text-2xl font-bold text-white">Choose Canvas Size</h2>
         <p className="mb-6 text-gray-400">Select a preset to start your design or define a custom size.</p>
 
-        {/* This is a placeholder for the close button if you need it */}
         {/* <button className="absolute top-4 right-4 text-gray-400 hover:text-white"><X size={24} /></button> */}
 
         <div className="grid grid-cols-3 gap-4">
