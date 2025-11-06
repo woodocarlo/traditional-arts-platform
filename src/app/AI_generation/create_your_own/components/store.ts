@@ -1,57 +1,214 @@
 import { create } from 'zustand';
 
-// (Keep the TextObject and CanvasObject types from the previous response)
+// --- Shadow Type ---
+export type ShadowProps = {
+  color: string;
+  blur: number;
+  offsetX: number;
+  offsetY: number;
+  opacity: number;
+};
+
+// --- Object Types ---
 export type TextObject = {
+  // ... (no changes)
   id: string;
   type: 'text';
   x: number;
   y: number;
   text: string;
   fontSize: number;
+  fontFamily: string;
   fill: string;
   rotation: number;
   width: number;
   height: number;
   scaleX: number;
   scaleY: number;
+  opacity: number;
+  shadow: ShadowProps;
 };
-export type CanvasObject = TextObject;
 
-// Define the state and actions
+export type ImageObject = {
+  id: string;
+  type: 'image';
+  src: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotation: number;
+  scaleX: number;
+  scaleY: number;
+  opacity: number;
+  shadow: ShadowProps;
+  // Filters
+  brightness: number;
+  contrast: number;
+  blur: number;
+  grayscale: boolean;
+  sepia: boolean;
+  invert: boolean;
+  emboss: boolean;
+  posterize: boolean;
+  noise: number; // <-- ADDED for "grain"
+};
+
+export type ShapeObject = {
+  id: string;
+  type: 'shape';
+  shapeType: 'rect' | 'circle' | 'triangle'; // <-- UPDATED
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fill: string;
+  stroke: string;
+  strokeWidth: number;
+  rotation: number;
+  scaleX: number;
+  scaleY: number;
+  opacity: number;
+  shadow: ShadowProps;
+};
+
+// <-- UPDATED (no code change, just confirming) -->
+export type CanvasObject = TextObject | ImageObject | ShapeObject;
+
+// ... (defaultShadow is unchanged)
+
+// --- ADD THESE: Drawing Types ---
+export type EditorMode = 'select' | 'draw' | 'erase';
+export type LineObject = {
+  id: string;
+  points: number[];
+  stroke: string;
+  strokeWidth: number;
+  compositeOperation: string;
+};
+
+
+// --- Editor State ---
 type EditorState = {
-  canvasSize: { width: number; height: number } | null; // <-- ADD THIS
-  setCanvasSize: (size: { width: number; height: number }) => void; // <-- ADD THIS
+  // ... (all properties are the same)
+  canvasSize: { width: number; height: number } | null;
+  canvasBackgroundColor: string;
   objects: CanvasObject[];
   selectedId: string | null;
-  addObject: (obj: Omit<CanvasObject, 'id'>) => void;
+  editorMode: EditorMode;
+  lines: LineObject[];
+  brushColor: string;
+  brushSize: number;
+  
+  setCanvasSize: (size: { width: number; height: number }) => void;
+  setBackgroundColor: (color: string) => void;
+  addObject: (obj: Omit<TextObject | ImageObject | ShapeObject, 'id'>) => void;
   setSelectedId: (id: string | null) => void;
-  updateObject: (id: string, newProps: Partial<CanvasObject>) => void;
+  updateObject: <T extends CanvasObject>(id: string, newProps: Partial<T>) => void;
+  deleteObject: (id: string) => void;
+  duplicateObject: (id: string) => void;
+  setEditorMode: (mode: EditorMode) => void;
+  setBrushColor: (color: string) => void;
+  setBrushSize: (size: number) => void;
+  addNewLine: (line: LineObject) => void;
+  updateLinePoints: (id: string, newPoints: number[]) => void;
 };
 
-export const useEditorStore = create<EditorState>((set) => ({
-  canvasSize: null, // <-- ADD THIS: Initialize as null
+export const useEditorStore = create<EditorState>((set, get) => ({
+  // ... (all default values are the same)
+  canvasSize: null,
+  canvasBackgroundColor: '#FFFFFF',
   objects: [],
   selectedId: null,
+  editorMode: 'select',
+  lines: [],
+  brushColor: '#000000',
+  brushSize: 5,
 
-  setCanvasSize: (size) => { // <-- ADD THIS
-    set({ canvasSize: size, objects: [], selectedId: null }); // Reset canvas on new size
-  },
+  // --- ACTIONS ---
   
+  setCanvasSize: (size) => {
+    set({ 
+      canvasSize: size, 
+      objects: [], 
+      lines: [],
+      selectedId: null, 
+      canvasBackgroundColor: '#FFFFFF' 
+    });
+  },
+
+  setBackgroundColor: (color) => {
+    set({ canvasBackgroundColor: color });
+  },
+
   addObject: (obj) => {
     const newObject = { ...obj, id: Date.now().toString() } as CanvasObject;
     set((state) => ({
       objects: [...state.objects, newObject],
+      selectedId: newObject.id, 
+      editorMode: 'select', // <-- FIX 1: Auto-switch to select
     }));
   },
 
   setSelectedId: (id) => {
-    set({ selectedId: id });
+    set({ selectedId: id, editorMode: 'select' });
   },
 
   updateObject: (id, newProps) => {
     set((state) => ({
       objects: state.objects.map((obj) =>
         obj.id === id ? { ...obj, ...newProps } : obj
+      ),
+    }));
+  },
+  
+  deleteObject: (id) => {
+    set((state) => ({
+      objects: state.objects.filter((obj) => obj.id !== id),
+      selectedId: null,
+    }));
+  },
+  
+  duplicateObject: (id) => {
+    const objectToDuplicate = get().objects.find((obj) => obj.id === id);
+    if (!objectToDuplicate) return;
+    
+    const newObject = {
+      ...objectToDuplicate,
+      id: Date.now().toString(),
+      x: objectToDuplicate.x + 20,
+      y: objectToDuplicate.y + 20,
+    } as CanvasObject;
+
+    set((state) => ({
+      objects: [...state.objects, newObject],
+      selectedId: newObject.id,
+      editorMode: 'select', // <-- FIX 1: Auto-switch to select
+    }));
+  },
+  
+  setEditorMode: (mode) => {
+    set({ editorMode: mode, selectedId: null }); 
+  },
+  
+  setBrushColor: (color) => {
+    set({ brushColor: color });
+  },
+  
+  setBrushSize: (size) => {
+    set({ brushSize: size });
+  },
+  
+  addNewLine: (line) => {
+    set((state) => ({
+      lines: [...state.lines, line],
+    }));
+  },
+  
+  updateLinePoints: (id, newPoints) => {
+    set((state) => ({
+      lines: state.lines.map((line) =>
+        line.id === id ? { ...line, points: newPoints } : line
       ),
     }));
   },
