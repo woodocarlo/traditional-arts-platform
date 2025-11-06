@@ -1,18 +1,46 @@
-// src/app/AI_generation/create_your_own/page.tsx
 "use client";
 
-import { Loader2 } from "lucide-react";
+import dynamic from 'next/dynamic';
+import { Loader2 } from 'lucide-react';
+import { useEditorStore } from './components/store';
+
+import Header from './components/Header';
+import LeftSidebar from './components/LeftSidebar';
+import RightSidebar from './components/RightSidebar';
+import ChooseCanvasSizeModal from './components/ChooseCanvasSizeModal';
+
+const CanvasArea = dynamic(() => import('./components/CanvasArea'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full w-full items-center justify-center bg-gray-800">
+      <Loader2 className="h-12 w-12 animate-spin text-purple-500" />
+    </div>
+  ),
+});
 
 export default function CreateYourOwnPage() {
+  const { canvasSize } = useEditorStore();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 to-black text-white">
-      <div className="text-center">
-        <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-purple-500" />
-        <h1 className="text-2xl font-bold">Editor is being upgraded</h1>
-        <p className="mt-2 text-gray-400">
-          The full canvas editor will be back shortly.
-        </p>
-      </div>
+    <div className="h-screen w-full flex flex-col bg-gradient-to-br from-[#1a1a2e] to-[#161625] text-white">
+      <Header />
+
+      {!canvasSize ? (
+        <ChooseCanvasSizeModal />
+      ) : (
+        <div className="flex flex-1 overflow-hidden">
+          {/* Left Sidebar */}
+          <LeftSidebar />
+
+          {/* Main Canvas Area */}
+          <main className="flex-1 overflow-auto">
+            <CanvasArea />
+          </main>
+
+          {/* Right Sidebar */}
+          <RightSidebar />
+        </div>
+      )}
     </div>
   );
 }
