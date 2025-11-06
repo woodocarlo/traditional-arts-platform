@@ -1,9 +1,10 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { VideoCameraIcon } from '../../components/icons'; // Assuming this icon is properly defined
+import { useInstructions } from '../../contexts/InstructionsContext';
 
 interface Workshop {
   id: string;
@@ -19,6 +20,22 @@ interface Workshop {
 
 const HostWorkshopPage = () => {
   const router = useRouter();
+  const { setInstructions } = useInstructions();
+
+  useEffect(() => {
+    setInstructions(
+      <div>
+        <p className="mb-4"><strong>How to Host Your Workshop:</strong></p>
+        <ul className="list-disc space-y-2 text-sm pl-5">
+          <li><strong>Create a New Workshop:</strong> Click the "Create New Workshop" button to open the planning modal and fill in the details.</li>
+          <li><strong>Edit an Existing Workshop:</strong> On any workshop card, click the edit icon (pencil) to modify its details.</li>
+          <li><strong>Delete a Workshop:</strong> Click the delete icon (trash) on the workshop card and confirm in the popup.</li>
+          <li><strong>Manage Your Workshop:</strong> Use the "Manage Workshop" button on the expanded card to handle live streaming or other settings.</li>
+          <li><strong>Create Advertisement:</strong> Click "Create Advertisement" to generate promotional content for your workshop.</li>
+        </ul>
+      </div>
+    );
+  }, [setInstructions]);
   const [workshops, setWorkshops] = useState<Workshop[]>([
     {
       id: '1',

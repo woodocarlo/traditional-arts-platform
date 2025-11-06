@@ -200,30 +200,20 @@ export default function GalleryPage() {
       <>
         <h2 className="text-xl font-bold text-gray-100">Gallery Instructions</h2>
         <ul className="space-y-2 list-disc list-inside text-gray-300">
-          <li>
-            <p className="text-gray-300">
-              The Art Gallery is your personal sanctuary for managing and promoting your masterpieces.
-            </p>
+          <li className="text-gray-300">
+            The Art Gallery is your personal sanctuary for managing and promoting your masterpieces.
           </li>
           <li>
-            <p>
-              <strong>Comprehensive Media Upload:</strong> Upload your artwork photos, videos, or even audio recordings of your legacy story (which can be used for future podcast generation).
-            </p>
+            <strong>Comprehensive Media Upload:</strong> Upload your artwork photos, videos, or even audio recordings of your legacy story (which can be used for future podcast generation).
           </li>
           <li>
-            <p>
-              <strong>View in AR:</strong> Click the &ldquo;View in AR&rdquo; button on any photo to see it on your wall using your phone&apos;s camera!
-            </p>
+            <strong>View in AR:</strong> Click the &ldquo;View in AR&rdquo; button on any photo to see it on your wall using your phone&apos;s camera!
           </li>
           <li>
-            <p>
             <strong>Instant Post Creation Prompt:</strong> Upon image upload, you&apos;ll be prompted with the option to immediately create a social media post for that artwork.
-          </p>
           </li>
           <li>
-            <p>
-              <strong>Smart Price Optimization Input:</strong> Define a minimum acceptable selling price for your crafts; our AI will then intelligently optimize the pricing to maximize sales while ensuring your profitability.
-            </p>
+            <strong>Smart Price Optimization Input:</strong> Define a minimum acceptable selling price for your crafts; our AI will then intelligently optimize the pricing to maximize sales while ensuring your profitability.
           </li>
         </ul>
       </>

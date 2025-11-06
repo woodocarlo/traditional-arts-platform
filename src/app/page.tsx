@@ -38,13 +38,16 @@ export default function App() {
             The <strong>Insight Dashboard</strong> is coded statically for Prototype 1.
           </li>
           <li>
-            The <strong>Auto-Pilot</strong> and <strong>Growth Wallet</strong> buttons are not currently working.
+            The <strong>Auto-Pilot</strong> and <strong>Growth Wallet</strong> buttons are in simulation model rightnow.
           </li>
           <li>
-            The <strong>Art Gallery</strong> Allows you to upload your media files and set a minimum price for it, you can also directly post them from here.
+            The <strong>Art Gallery</strong> Allows you to upload your media files and set a minimum price for it, you can also directly post them from here. Also view, AR view of your art.
           </li>
           <li>
-            The <strong>Creative Arena</strong> consists of the working features available in the platform.
+            The <strong>Creative Arena</strong> consists of the working features, such as AI generation of art, image editing, podcast generation with audio and video generation and studio quality photoshoot tips.
+          </li>
+          <li>
+            The <strong>Host a Workshop</strong> create and manage workshops on a variety of platforms, and share them with your audience.
           </li>
         </ul>
       </>

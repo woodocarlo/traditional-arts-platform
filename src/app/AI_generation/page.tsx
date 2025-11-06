@@ -114,9 +114,13 @@ export default function KalaSakhiLandingPage() {
           <InstructionsHeader />
           <ul className="space-y-2 list-disc list-inside text-gray-300">
             <li>
-              <strong>Integrated Creative Suite:</strong> Access core features
-              including automated Social Media Post Generation, personalized
-              Podcast Creation, and expert Photography Guidance.
+              <strong>Social Media Post Generation:</strong> Choose your artwork, select the optimal aspect ratio for your platform, and instantly generate engaging posts with trending hashtags and captivating captions.
+            </li>
+            <li>
+              <strong>Podcast Creation:</strong> Select language and duration, choose between audio-only or face-based podcasts, upload face video if needed, and generate AI-powered scripts, audio, and lip-sync videos.
+            </li>
+            <li>
+              <strong>Photography Guidance:</strong> Get expert tips for capturing professional-quality photos of your crafts, including lighting, angles, composition, and staging recommendations.
             </li>
             <li>
               <strong>&quot;Create Your Own Post&quot; Studio:</strong> Utilize an
@@ -147,6 +151,15 @@ export default function KalaSakhiLandingPage() {
             <li>
               <strong>Content Generation:</strong> Opt for a fully AI-generated
               script, or input specific questions to guide the AI.
+            </li>
+            <li>
+              <strong>Face Video Upload:</strong> For face podcasts, click "Upload Face Video" to record or upload a video of your face for lip-sync animation.
+            </li>
+            <li>
+              <strong>Narrator Gender:</strong> Select male or female narrator for the voice and lip-sync.
+            </li>
+            <li>
+              <strong>Creating the Podcast:</strong> Enter a main topic, select suggested topics if needed, and click "Create Podcast" to generate the script, audio, and video.
             </li>
           </ul>
         </>
