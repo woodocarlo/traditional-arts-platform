@@ -27,11 +27,11 @@ const HostWorkshopPage = () => {
       <div>
         <p className="mb-4"><strong>How to Host Your Workshop:</strong></p>
         <ul className="list-disc space-y-2 text-sm pl-5">
-          <li><strong>Create a New Workshop:</strong> Click the "Create New Workshop" button to open the planning modal and fill in the details.</li>
+          <li><strong>Create a New Workshop:</strong> Click the &ldquo;Create New Workshop&rdquo; button to open the planning modal and fill in the details.</li>
           <li><strong>Edit an Existing Workshop:</strong> On any workshop card, click the edit icon (pencil) to modify its details.</li>
           <li><strong>Delete a Workshop:</strong> Click the delete icon (trash) on the workshop card and confirm in the popup.</li>
-          <li><strong>Manage Your Workshop:</strong> Use the "Manage Workshop" button on the expanded card to handle live streaming or other settings.</li>
-          <li><strong>Create Advertisement:</strong> Click "Create Advertisement" to generate promotional content for your workshop.</li>
+          <li><strong>Manage Your Workshop:</strong> Use the &ldquo;Manage Workshop&rdquo; button on the expanded card to handle live streaming or other settings.</li>
+          <li><strong>Create Advertisement:</strong> Click &ldquo;Create Advertisement&rdquo; to generate promotional content for your workshop.</li>
         </ul>
       </div>
     );

@@ -153,13 +153,13 @@ export default function KalaSakhiLandingPage() {
               script, or input specific questions to guide the AI.
             </li>
             <li>
-              <strong>Face Video Upload:</strong> For face podcasts, click "Upload Face Video" to record or upload a video of your face for lip-sync animation.
+              <strong>Face Video Upload:</strong> For face podcasts, click &ldquo;Upload Face Video&rdquo; to record or upload a video of your face for lip-sync animation.
             </li>
             <li>
               <strong>Narrator Gender:</strong> Select male or female narrator for the voice and lip-sync.
             </li>
             <li>
-              <strong>Creating the Podcast:</strong> Enter a main topic, select suggested topics if needed, and click "Create Podcast" to generate the script, audio, and video.
+              <strong>Creating the Podcast:</strong> Enter a main topic, select suggested topics if needed, and click &ldquo;Create Podcast&rdquo; to generate the script, audio, and video.
             </li>
           </ul>
         </>
