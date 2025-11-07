@@ -1,3 +1,7 @@
+// {
+// type: "new_file",
+// fileName: "store.ts",
+// fileContent:
 import { create } from 'zustand';
 
 // --- Shadow Type ---
@@ -11,7 +15,6 @@ export type ShadowProps = {
 
 // --- Object Types ---
 export type TextObject = {
-  // ... (no changes)
   id: string;
   type: 'text';
   x: number;
@@ -38,26 +41,38 @@ export type ImageObject = {
   width: number;
   height: number;
   rotation: number;
-  scaleX: number;
-  scaleY: number;
+  scaleX: number; // <-- This will now handle flip (e.g., -1)
+  scaleY: number; // <-- This will now handle flip (e.g., -1)
   opacity: number;
   shadow: ShadowProps;
-  // Filters
+  
+  // Basic Filters
   brightness: number;
   contrast: number;
   blur: number;
   grayscale: boolean;
   sepia: boolean;
   invert: boolean;
-  emboss: boolean;
-  posterize: boolean;
-  noise: number; // <-- ADDED for "grain"
+  
+  // --- NEW / UPDATED ---
+  noise: number; // Was present but not in panel
+  emboss: boolean; // Was present but not in panel
+  posterize: boolean; // Was present but not in panel
+
+  // HSL
+  hue: number;
+  saturation: number;
+  luminance: number;
+
+  // Colorize
+  colorize: string;
+  colorizeStrength: number;
 };
 
 export type ShapeObject = {
   id: string;
   type: 'shape';
-  shapeType: 'rect' | 'circle' | 'triangle'; // <-- UPDATED
+  shapeType: 'rect' | 'circle' | 'triangle';
   x: number;
   y: number;
   width: number;
@@ -72,12 +87,9 @@ export type ShapeObject = {
   shadow: ShadowProps;
 };
 
-// <-- UPDATED (no code change, just confirming) -->
 export type CanvasObject = TextObject | ImageObject | ShapeObject;
 
-// ... (defaultShadow is unchanged)
-
-// --- ADD THESE: Drawing Types ---
+// --- Drawing Types ---
 export type EditorMode = 'select' | 'draw' | 'erase';
 export type LineObject = {
   id: string;
@@ -90,7 +102,6 @@ export type LineObject = {
 
 // --- Editor State ---
 type EditorState = {
-  // ... (all properties are the same)
   canvasSize: { width: number; height: number } | null;
   canvasBackgroundColor: string;
   objects: CanvasObject[];
@@ -115,7 +126,6 @@ type EditorState = {
 };
 
 export const useEditorStore = create<EditorState>((set, get) => ({
-  // ... (all default values are the same)
   canvasSize: null,
   canvasBackgroundColor: '#FFFFFF',
   objects: [],
@@ -146,7 +156,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     set((state) => ({
       objects: [...state.objects, newObject],
       selectedId: newObject.id, 
-      editorMode: 'select', // <-- FIX 1: Auto-switch to select
+      editorMode: 'select',
     }));
   },
 
@@ -183,7 +193,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     set((state) => ({
       objects: [...state.objects, newObject],
       selectedId: newObject.id,
-      editorMode: 'select', // <-- FIX 1: Auto-switch to select
+      editorMode: 'select',
     }));
   },
   
@@ -213,3 +223,4 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     }));
   },
 }));
+// }

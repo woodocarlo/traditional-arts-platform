@@ -1,3 +1,7 @@
+// {
+// type: "new_file",
+// fileName: "LeftSidebar.tsx",
+// fileContent:
 "use client";
 
 import React, { useRef } from 'react';
@@ -22,11 +26,11 @@ const ToolButton = ({ icon: Icon, label, onClick }: ToolButtonProps) => (
 );
 
 export default function LeftSidebar() {
-  const { addObject, canvasSize, setEditorMode } = useEditorStore(); // <-- Get setEditorMode
+  const { addObject, canvasSize, setEditorMode } = useEditorStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleAddText = () => {
-    setEditorMode('select'); // <-- FIX 1: Auto-switch to select
+    setEditorMode('select');
     addObject({
       type: 'text',
       x: 100,
@@ -46,7 +50,7 @@ export default function LeftSidebar() {
   };
 
   const handleImageUploadClick = () => {
-    setEditorMode('select'); // <-- FIX 1: Auto-switch to select
+    setEditorMode('select');
     fileInputRef.current?.click();
   };
 
@@ -66,7 +70,7 @@ export default function LeftSidebar() {
         const width = img.width * scale;
         const height = img.height * scale;
 
-        setEditorMode('select'); // <-- FIX 1: Auto-switch to select (inside async)
+        setEditorMode('select');
         addObject({
           type: 'image',
           src: src,
@@ -79,15 +83,24 @@ export default function LeftSidebar() {
           scaleY: 1,
           opacity: 1,
           shadow: { color: '#000', blur: 0, offsetX: 0, offsetY: 0, opacity: 0.5 },
+          // Basic
           brightness: 0,
           contrast: 0,
           blur: 0,
           grayscale: false,
           sepia: false,
           invert: false,
+          // --- NEW DEFAULTS ---
+          noise: 0,
           emboss: false,
           posterize: false,
-          noise: 0, // <-- ADDED noise default
+          // HSL
+          hue: 0,
+          saturation: 0,
+          luminance: 0,
+          // Colorize
+          colorize: '#FFFFFF',
+          colorizeStrength: 0,
         } as Omit<ImageObject, 'id'>);
       };
     };
@@ -97,7 +110,6 @@ export default function LeftSidebar() {
   };
 
   return (
-    // ... (rest of the component is unchanged)
     <aside className="w-20 bg-[#0e0e1a] p-2">
       <div className="flex flex-col gap-2">
         <input
@@ -118,3 +130,4 @@ export default function LeftSidebar() {
     </aside>
   );
 }
+// }
