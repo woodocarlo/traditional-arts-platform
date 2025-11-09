@@ -3,8 +3,6 @@ import React, { useState, useRef, useEffect } from "react";
 import Image from 'next/image';
 import axios from 'axios';
 
-const REMOVE_BG_API_KEY = process.env.NEXT_PUBLIC_REMOVE_BG_API_KEY || "e4SioiZoiXNbMsXPXtXeYBR5";
-
 // **REMOVED** The static STORY_TEMPLATE is GONE.
 // We will now generate prompts dynamically.
 
@@ -75,6 +73,14 @@ export default function CraftPostGenerator() {
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const [description, setDescription] = useState<string>("");
   const [postType, setPostType] = useState<string>("Shop Drop");
+  const [removeBgApiKey, setRemoveBgApiKey] = useState<string>(process.env.NEXT_PUBLIC_REMOVE_BG_API_KEY || "e4SioiZoiXNbMsXPXtXeYBR5");
+  const [customApiKey, setCustomApiKey] = useState<string>("");
+  const [showApiKeyModal, setShowApiKeyModal] = useState<boolean>(false);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [geminiApiKey, setGeminiApiKey] = useState<string>(process.env.NEXT_PUBLIC_GEMINI_API_KEY || "");
+  const [customGeminiApiKey, setCustomGeminiApiKey] = useState<string>("");
+  const [showGeminiApiKeyModal, setShowGeminiApiKeyModal] = useState<boolean>(false);
+  const [pendingGeneration, setPendingGeneration] = useState<(() => void) | null>(null);
 
   const generationSteps = [
     'Analyzing your craft...',
@@ -89,18 +95,18 @@ export default function CraftPostGenerator() {
     const file = e.target.files?.[0];
     if (file) {
       console.log("Image uploaded:", file.name, file.size);
-      setUploadedImageFile(file);
-      
+      setPendingFile(file);
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setUploadedImage(reader.result as string);
       };
       reader.readAsDataURL(file);
 
-      // Remove background immediately
+      // Try to remove background with current API key
       setIsUploading(true);
       setGenerationMessage('Removing background...');
-      
+
       try {
         const formData = new FormData();
         formData.append('image_file', file);
@@ -108,7 +114,7 @@ export default function CraftPostGenerator() {
 
         const response = await axios.post("https://api.remove.bg/v1.0/removebg", formData, {
           headers: {
-            "X-Api-Key": REMOVE_BG_API_KEY,
+            "X-Api-Key": removeBgApiKey,
             "Content-Type": "multipart/form-data",
           },
           responseType: "blob",
@@ -117,13 +123,50 @@ export default function CraftPostGenerator() {
         const processedUrl = URL.createObjectURL(response.data);
         setProcessedImage(processedUrl);
         setGenerationMessage('Background removed successfully!');
+        setUploadedImageFile(file);
       } catch (error) {
         console.error("Error removing background:", error);
-        alert("Failed to remove background. Will use original image.");
-        setProcessedImage(uploadedImage);
+        // Show modal to enter custom API key
+        setShowApiKeyModal(true);
+        setGenerationMessage('API key in system variables did not respond well. Enter your custom API key.');
       } finally {
         setIsUploading(false);
       }
+    }
+  };
+
+  const handleCustomApiKeySubmit = async () => {
+    if (!customApiKey || !pendingFile) return;
+
+    setIsUploading(true);
+    setGenerationMessage('Removing background with custom API key...');
+
+    try {
+      const formData = new FormData();
+      formData.append('image_file', pendingFile);
+      formData.append('size', 'auto');
+
+      const response = await axios.post("https://api.remove.bg/v1.0/removebg", formData, {
+        headers: {
+          "X-Api-Key": customApiKey,
+          "Content-Type": "multipart/form-data",
+        },
+        responseType: "blob",
+      });
+
+      const processedUrl = URL.createObjectURL(response.data);
+      setProcessedImage(processedUrl);
+      setGenerationMessage('Background removed successfully!');
+      setUploadedImageFile(pendingFile);
+      setRemoveBgApiKey(customApiKey);
+      setShowApiKeyModal(false);
+      setCustomApiKey("");
+      setPendingFile(null);
+    } catch (error) {
+      console.error("Error with custom API key:", error);
+      alert("Custom API key also failed. Please check your API key and try again.");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -144,7 +187,7 @@ export default function CraftPostGenerator() {
       alert('Please upload an image first and wait for background removal');
       return;
     }
-    
+
     // **CRITICAL**: Check if description is provided
     if (!description) {
         alert('Please describe your craft first! (e.g., "hand-thrown pottery", "modern art canvas")');
@@ -158,14 +201,14 @@ export default function CraftPostGenerator() {
 
     try {
       const base64Image = await blobToBase64(processedImage);
-      
+
       const posts: GeneratedPost[] = [];
       let mainCaption = '';
       let mainHashtags: string[] = [];
       const artType = description; // Use the user's description as the art type
-      
+
       let promptList: string[] = [];
-      
+
       // **NEW DYNAMIC PROMPTS**
       if (postType === "Unfold the Tale") {
         promptList = [
@@ -198,7 +241,7 @@ export default function CraftPostGenerator() {
         const prompt = promptList[i]
             .replace(/\[ART_TYPE\]/g, artType) // 'g' flag to replace all instances
             .replace('[ASPECT_RATIO]', aspectRatio);
-        
+
         // Generate caption for first slide of carousel, or for ALL slides of Shop Drop
         const shouldGenerateCaption = (postType !== "Unfold the Tale") || (i === 0);
 
@@ -211,12 +254,22 @@ export default function CraftPostGenerator() {
             prompt: prompt,
             imageBase64: base64Image,
             generateCaption: shouldGenerateCaption,
-            artType: artType // Send the user's description to the API
+            artType: artType, // Send the user's description to the API
+            customApiKey: geminiApiKey // Send the current API key
           }),
         });
 
         if (!response.ok) {
           const errorData = await response.json();
+          // Check if it's an API key related error
+          if (errorData.error && (errorData.error.includes('quota') || errorData.error.includes('API key') || errorData.error.includes('429'))) {
+            // Store the current generation function to retry later
+            setPendingGeneration(() => () => generatePosts());
+            setShowGeminiApiKeyModal(true);
+            setGenerationMessage('API key issue detected. Please enter your custom Gemini API key.');
+            setIsUploading(false);
+            return;
+          }
           throw new Error(errorData.error || 'Failed to generate image');
         }
 
@@ -268,6 +321,30 @@ export default function CraftPostGenerator() {
     }
   };
 
+  const handleCustomGeminiApiKeySubmit = async () => {
+    if (!customGeminiApiKey) return;
+
+    setIsUploading(true);
+    setGenerationMessage('Retrying generation with custom API key...');
+
+    try {
+      // Update the API key
+      setGeminiApiKey(customGeminiApiKey);
+      setShowGeminiApiKeyModal(false);
+      setCustomGeminiApiKey("");
+
+      // Retry the pending generation
+      if (pendingGeneration) {
+        pendingGeneration();
+        setPendingGeneration(null);
+      }
+    } catch (error) {
+      console.error("Error with custom API key:", error);
+      alert("Failed to retry with custom API key. Please check your API key and try again.");
+      setIsUploading(false);
+    }
+  };
+
   const regenerateImage = async (index: number) => {
     if (!processedImage || !description) {
       alert('No processed image or description available');
@@ -291,18 +368,19 @@ export default function CraftPostGenerator() {
           .replace(/\[ART_TYPE\]/g, artType)
           .replace('[ASPECT_RATIO]', aspectRatio);
 
-      const response = await fetch('/api/generate-image', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt: prompt,
-          imageBase64: base64Image,
-          generateCaption: true, // Always generate new caption on regenerate
-          artType: artType
-        }),
-      });
+        const response = await fetch('/api/generate-image', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            prompt: prompt,
+            imageBase64: base64Image,
+            generateCaption: true, // Always generate new caption on regenerate
+            artType: artType,
+            customApiKey: geminiApiKey // Send the current API key
+          }),
+        });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -721,6 +799,80 @@ export default function CraftPostGenerator() {
           )}
         </div>
       </div>
+
+      {showApiKeyModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-red-900/20 p-8 rounded-2xl border border-red-500/50 text-center max-w-md">
+            <h3 className="text-xl font-semibold text-red-400 mb-4">Remove.bg API Key Required</h3>
+            <p className="text-red-200 mb-6">
+              The API key in system variables did not respond well. Please enter your custom Remove.bg API key to continue.
+            </p>
+            <input
+              type="text"
+              value={customApiKey}
+              onChange={(e) => setCustomApiKey(e.target.value)}
+              placeholder="Enter your Remove.bg API key"
+              className="w-full p-3 bg-red-900/20 border border-red-500/30 rounded-lg text-white placeholder-red-300 mb-4 focus:border-red-400 focus:outline-none"
+            />
+            <div className="flex gap-4">
+              <button
+                onClick={() => {
+                  setShowApiKeyModal(false);
+                  setPendingFile(null);
+                  setGenerationMessage('');
+                }}
+                className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCustomApiKeySubmit}
+                disabled={!customApiKey}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showGeminiApiKeyModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-red-900/20 p-8 rounded-2xl border border-red-500/50 text-center max-w-md">
+            <h3 className="text-xl font-semibold text-red-400 mb-4">Gemini API Key Required</h3>
+            <p className="text-red-200 mb-6">
+              There was an issue with the API key (quota exceeded, invalid key, etc.). Please enter your custom Gemini API key to continue generating posts.
+            </p>
+            <input
+              type="text"
+              value={customGeminiApiKey}
+              onChange={(e) => setCustomGeminiApiKey(e.target.value)}
+              placeholder="Enter your Gemini API key"
+              className="w-full p-3 bg-red-900/20 border border-red-500/30 rounded-lg text-white placeholder-red-300 mb-4 focus:border-red-400 focus:outline-none"
+            />
+            <div className="flex gap-4">
+              <button
+                onClick={() => {
+                  setShowGeminiApiKeyModal(false);
+                  setPendingGeneration(null);
+                  setGenerationMessage('');
+                }}
+                className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCustomGeminiApiKeySubmit}
+                disabled={!customGeminiApiKey}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {expandedImage && (
         <div

@@ -6,18 +6,18 @@ const API_KEY = process.env.api_generate_image; // This is now 'string | undefin
 const MODEL_NAME = 'gemini-2.5-flash-image-preview';
 
 export async function POST(request: NextRequest) {
-  // --- START FIX ---
-  // Check if the API key is actually set
-  if (!API_KEY) {
-    return NextResponse.json(
-      { error: 'API key is not configured in environment variables.' },
-      { status: 500 }
-    );
-  }
-  // --- END FIX ---
-
   try {
-    const { prompt, imageBase64 } = await request.json();
+    const { prompt, imageBase64, customApiKey } = await request.json();
+
+    // Use custom API key if provided, otherwise use environment variable
+    const apiKey = customApiKey || API_KEY;
+
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: 'API key is not configured. Please provide a custom API key.' },
+        { status: 500 }
+      );
+    }
 
     if (!prompt || !imageBase64) {
       return NextResponse.json(
@@ -27,8 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Initialize the Gemini client
-    // Now TypeScript knows API_KEY is a string because of the check above
-    const genAI = new GoogleGenerativeAI(API_KEY);
+    const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
     // ... (rest of your code is fine)
