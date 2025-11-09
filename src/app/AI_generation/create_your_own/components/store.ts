@@ -22,7 +22,7 @@ export type TextObject = {
   text: string;
   fontSize: number;
   fontFamily: string;
-  fill: string;
+  fill: string; // Color
   rotation: number;
   width: number;
   height: number;
@@ -30,6 +30,13 @@ export type TextObject = {
   scaleY: number;
   opacity: number;
   shadow: ShadowProps;
+  // --- NEW PROPERTIES ---
+  fontWeight: string; // 'normal', 'bold'
+  fontStyle: string; // 'normal', 'italic'
+  textDecoration: string; // 'none', 'underline', 'line-through'
+  align: string; // 'left', 'center', 'right'
+  lineHeight: number; // 1, 1.2, 1.5 etc.
+  letterSpacing: number; // 0, 1, 2 etc.
 };
 
 export type ImageObject = {

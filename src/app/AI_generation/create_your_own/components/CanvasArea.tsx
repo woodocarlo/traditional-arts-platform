@@ -1,18 +1,18 @@
 "use client";
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Stage, Layer, Transformer, Line } from 'react-konva';
 import { useEditorStore } from './store';
 import Konva from 'konva';
 import { CanvasElement } from './CanvasElement';
 
 export default function CanvasArea() {
-  const { 
-    canvasSize, 
-    canvasBackgroundColor, 
-    objects, 
-    selectedId, 
-    setSelectedId, 
+  const {
+    canvasSize,
+    canvasBackgroundColor,
+    objects,
+    selectedId,
+    setSelectedId,
     updateObject,
     // --- DRAWING STATE ---
     editorMode,
@@ -22,12 +22,33 @@ export default function CanvasArea() {
     addNewLine,
     updateLinePoints
   } = useEditorStore();
-  
+
   const stageRef = useRef<Konva.Stage>(null);
   const trRef = useRef<Konva.Transformer>(null);
-  
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const [scale, setScale] = useState(1);
+
   const isDrawing = useRef(false);
   const currentLineId = useRef<string | null>(null);
+
+  useEffect(() => {
+    const updateScale = () => {
+      if (containerRef.current && canvasSize) {
+        const container = containerRef.current;
+        const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
+        const scaleX = containerWidth / canvasSize.width;
+        const scaleY = containerHeight / canvasSize.height;
+        const newScale = Math.min(scaleX, scaleY, 1);
+        setScale(newScale);
+      }
+    };
+
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, [canvasSize]);
 
   useEffect(() => {
     // ... (This useEffect is unchanged)
@@ -107,10 +128,14 @@ export default function CanvasArea() {
   if (!canvasSize) return null;
 
   return (
-    <div className="h-full w-full p-8 flex items-center justify-center overflow-auto">
-      <div 
+    <div ref={containerRef} className="h-full w-full p-4 flex items-center justify-center overflow-hidden">
+      <div
         className="shadow-2xl"
-        style={{ cursor: editorMode === 'select' ? 'default' : 'crosshair' }} 
+        style={{
+          cursor: editorMode === 'select' ? 'default' : 'crosshair',
+          transform: `scale(${scale})`,
+          transformOrigin: 'center'
+        }}
       >
         <Stage
           ref={stageRef}
