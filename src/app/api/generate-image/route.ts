@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+// 1. Import the 'Part' type
+import { GoogleGenerativeAI, Part } from '@google/generative-ai';
 
 // API key from environment variable
 const API_KEY = process.env.api_generate_image; // This is now 'string | undefined'
@@ -19,9 +20,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!prompt || !imageBase64) {
+    if (!prompt) {
       return NextResponse.json(
-        { error: 'Missing prompt or image' },
+        { error: 'Missing prompt' },
         { status: 400 }
       );
     }
@@ -30,18 +31,23 @@ export async function POST(request: NextRequest) {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
-    // ... (rest of your code is fine)
-    
-    // Convert base64 to the format Gemini expects
-    const imageParts = {
-      inlineData: {
-        data: imageBase64.split(',')[1] || imageBase64,
-        mimeType: 'image/png'
-      }
-    };
+    // 2. Change 'any[]' to 'Part[]' and wrap the prompt
+    const contentParts: Part[] = [{ text: prompt }];
 
-    // Generate content with image + prompt
-    const result = await model.generateContent([prompt, imageParts]);
+    if (imageBase64) {
+      // If image is provided, add it for image-to-image generation
+      // 3. Explicitly type the image part
+      const imagePart: Part = {
+        inlineData: {
+          data: imageBase64.split(',')[1] || imageBase64,
+          mimeType: 'image/png'
+        }
+      };
+      contentParts.push(imagePart);
+    }
+
+    // Generate content
+    const result = await model.generateContent(contentParts);
     const response = result.response;
 
     // Extract generated image from response
@@ -61,7 +67,7 @@ export async function POST(request: NextRequest) {
     if (generatedImageData && generatedImageData.mimeType.startsWith('image/')) {
       // Convert to base64 string for frontend
       const imageBase64Result = `data:${generatedImageData.mimeType};base64,${generatedImageData.data}`;
-      
+
       return NextResponse.json({
         success: true,
         generatedImage: imageBase64Result,

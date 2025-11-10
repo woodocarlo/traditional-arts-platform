@@ -1,7 +1,3 @@
-// {
-// type: "new_file",
-// fileName: "store.ts",
-// fileContent:
 import { create } from 'zustand';
 
 // --- Shadow Type ---
@@ -52,7 +48,7 @@ export type ImageObject = {
   scaleY: number; // <-- This will now handle flip (e.g., -1)
   opacity: number;
   shadow: ShadowProps;
-  
+
   // Basic Filters
   brightness: number;
   contrast: number;
@@ -60,7 +56,7 @@ export type ImageObject = {
   grayscale: boolean;
   sepia: boolean;
   invert: boolean;
-  
+
   // --- NEW / UPDATED ---
   noise: number; // Was present but not in panel
   emboss: boolean; // Was present but not in panel
@@ -106,7 +102,6 @@ export type LineObject = {
   compositeOperation: string;
 };
 
-
 // --- Editor State ---
 type EditorState = {
   canvasSize: { width: number; height: number } | null;
@@ -117,7 +112,7 @@ type EditorState = {
   lines: LineObject[];
   brushColor: string;
   brushSize: number;
-  
+
   setCanvasSize: (size: { width: number; height: number }) => void;
   setBackgroundColor: (color: string) => void;
   addObject: (obj: Omit<TextObject | ImageObject | ShapeObject, 'id'>) => void;
@@ -130,6 +125,7 @@ type EditorState = {
   setBrushSize: (size: number) => void;
   addNewLine: (line: LineObject) => void;
   updateLinePoints: (id: string, newPoints: number[]) => void;
+  downloadCanvas: () => void;
 };
 
 export const useEditorStore = create<EditorState>((set, get) => ({
@@ -143,14 +139,14 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   brushSize: 5,
 
   // --- ACTIONS ---
-  
+
   setCanvasSize: (size) => {
-    set({ 
-      canvasSize: size, 
-      objects: [], 
+    set({
+      canvasSize: size,
+      objects: [],
       lines: [],
-      selectedId: null, 
-      canvasBackgroundColor: '#FFFFFF' 
+      selectedId: null,
+      canvasBackgroundColor: '#FFFFFF'
     });
   },
 
@@ -162,7 +158,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const newObject = { ...obj, id: Date.now().toString() } as CanvasObject;
     set((state) => ({
       objects: [...state.objects, newObject],
-      selectedId: newObject.id, 
+      selectedId: newObject.id,
       editorMode: 'select',
     }));
   },
@@ -178,18 +174,18 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       ),
     }));
   },
-  
+
   deleteObject: (id) => {
     set((state) => ({
       objects: state.objects.filter((obj) => obj.id !== id),
       selectedId: null,
     }));
   },
-  
+
   duplicateObject: (id) => {
     const objectToDuplicate = get().objects.find((obj) => obj.id === id);
     if (!objectToDuplicate) return;
-    
+
     const newObject = {
       ...objectToDuplicate,
       id: Date.now().toString(),
@@ -203,25 +199,25 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       editorMode: 'select',
     }));
   },
-  
+
   setEditorMode: (mode) => {
-    set({ editorMode: mode, selectedId: null }); 
+    set({ editorMode: mode, selectedId: null });
   },
-  
+
   setBrushColor: (color) => {
     set({ brushColor: color });
   },
-  
+
   setBrushSize: (size) => {
     set({ brushSize: size });
   },
-  
+
   addNewLine: (line) => {
     set((state) => ({
       lines: [...state.lines, line],
     }));
   },
-  
+
   updateLinePoints: (id, newPoints) => {
     set((state) => ({
       lines: state.lines.map((line) =>
@@ -229,5 +225,14 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       ),
     }));
   },
+
+  downloadCanvas: () => {
+    const canvas = document.querySelector('canvas');
+    if (canvas) {
+      const link = document.createElement('a');
+      link.download = 'canvas.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+  },
 }));
-// }

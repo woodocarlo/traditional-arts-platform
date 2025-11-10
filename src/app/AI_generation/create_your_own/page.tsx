@@ -19,11 +19,15 @@ const CanvasArea = dynamic(() => import('./components/CanvasArea'), {
 });
 
 export default function CreateYourOwnPage() {
-  const { canvasSize } = useEditorStore();
+  const { canvasSize, downloadCanvas } = useEditorStore();
+
+  const handleDownload = () => {
+    downloadCanvas();
+  };
 
   return (
     <div className="h-screen w-full flex flex-col bg-gradient-to-br from-[#1a1a2e] to-[#161625] text-white">
-      <Header />
+      <Header onDownload={handleDownload} />
 
       {!canvasSize ? (
         <ChooseCanvasSizeModal />
