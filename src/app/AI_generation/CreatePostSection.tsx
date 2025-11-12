@@ -510,11 +510,29 @@ export default function CreatePostSection({ cardId, onClose, cardData }: { cardI
               ))}
             </div>
             <div className="mt-6 w-64 bg-gray-700 rounded-full h-2">
-              <div 
+              <div
                 className="bg-gradient-to-r from-purple-600 to-pink-600 h-2 rounded-full animate-pulse"
                 style={{width: `${(currentStep / steps.length) * 100}%`}}
               ></div>
             </div>
+            {podcastConfig.type === 'face' && currentStep === 3 && (
+              <div className="max-w-sm mx-auto mt-4">
+                <p className="text-gray-300 text-sm">
+                  This may take up to 5 minutes<br />
+                  based on the length and quality of the video.<br />
+                  Refer to the below video for a quick demo:<br />
+                  <a href="https://youtu.be/cmi0Y2dB_e8" target="_blank" rel="noopener noreferrer" className="text-purple-400 underline">https://youtu.be/cmi0Y2dB_e8</a>
+                </p>
+              </div>
+            )}
+            {podcastConfig.type === 'audio' && currentStep === 2 && (
+              <div className="max-w-sm mx-auto mt-4">
+                <p className="text-gray-300 text-sm">
+                  Audio generation may take<br />
+                  a few minutes.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}
